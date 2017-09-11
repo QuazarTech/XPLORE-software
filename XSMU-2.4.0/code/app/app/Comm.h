@@ -1576,13 +1576,12 @@ protected:
 class CommRequest_changeBaud : public CommPacket_changeBaud
 {
 public:
-	CommRequest_changeBaud (uint16_t baudRate) :
+	CommRequest_changeBaud (uint32_t baudRate) :
 		baudRate_(baudRate)
 	{}
 
 private:
-	uint16_t baudRate_;
-	uint16_t reserve_;
+	uint32_t baudRate_;
 };
 
 class CommResponse_changeBaud : public CommPacket_changeBaud
@@ -1591,11 +1590,10 @@ private:
 	CommResponse_changeBaud (void);
 
 public:
-	uint16_t baudRate (void) const {return smu::ntoh(baudRate_);}
+	uint32_t baudRate (void) const {return smu::ntoh(baudRate_);}
 
 private:
-	uint16_t baudRate_;
-	uint16_t reserve_;
+	uint32_t baudRate_;
 };
 /******************************************************************/
 /******************************************************************/
@@ -2383,16 +2381,16 @@ private:
 class CommCB_changeBaud : public CommCB
 {
 public:
-	CommCB_changeBaud (uint16_t baudRate) :
+	CommCB_changeBaud (uint32_t baudRate) :
 		CommCB (COMM_CBCODE_CHANGE_BAUD),
 		baudRate_ (baudRate)
 	{}
 
 public:
-	uint16_t baudRate (void) const {return baudRate_;}
+	uint32_t baudRate (void) const {return baudRate_;}
 
 private:
-	uint16_t baudRate_;
+	uint32_t baudRate_;
 };
 /******************************************************************/
 /******************************************************************/
@@ -2544,7 +2542,7 @@ public:
 	
 	/********************************/
 	
-	void transmit_changeBaud     (uint16_t baudRate);
+	void transmit_changeBaud     (uint32_t baudRate);
 	
 private:
 	QP4* qp4_;
