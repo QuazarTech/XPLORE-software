@@ -64,6 +64,8 @@ enum Comm_Opcode
 	COMM_OPCODE_VM2_LOAD_DEFAULT_CALIBRATION,                       //40
 	COMM_OPCODE_VM_SET_TERMINAL,                                    //41
 	COMM_OPCODE_VM_GET_TERMINAL,                                    //42
+	
+	COMM_OPCODE_CHANGE_BAUD,                                        //43
 };
 
 enum Comm_SourceMode
@@ -1562,63 +1564,99 @@ private:
 };
 
 /******************************************************************/
+
+class CommPacket_changeBaud : public CommPacket
+{
+protected:
+	CommPacket_changeBaud (void) :
+		CommPacket (COMM_OPCODE_CHANGE_BAUD)
+	{}
+};
+
+class CommRequest_changeBaud : public CommPacket_changeBaud
+{
+public:
+	CommRequest_changeBaud (uint16_t baudRate) :
+		baudRate_(baudRate)
+	{}
+
+private:
+	uint16_t baudRate_;
+	uint16_t reserve_;
+};
+
+class CommResponse_changeBaud : public CommPacket_changeBaud
+{
+private:
+	CommResponse_changeBaud (void);
+
+public:
+	uint16_t baudRate (void) const {return smu::ntoh(baudRate_);}
+
+private:
+	uint16_t baudRate_;
+	uint16_t reserve_;
+};
+/******************************************************************/
 /******************************************************************/
 
 enum Comm_CallbackCode
 {
-	COMM_CBCODE_NOP,
-	COMM_CBCODE_IDN,
-	COMM_CBCODE_SYNC,
+	COMM_CBCODE_NOP,                                          //00
+	COMM_CBCODE_IDN,                                          //01
+	COMM_CBCODE_SYNC,                                         //02
 
-	COMM_CBCODE_SET_SOURCE_MODE,
+	COMM_CBCODE_SET_SOURCE_MODE,                              //03
 
-	COMM_CBCODE_CS_SET_RANGE,
-	COMM_CBCODE_CS_GET_CALIBRATION,
-	COMM_CBCODE_CS_VERIFY_CALIBRATION,
-	COMM_CBCODE_CS_SET_CALIBRATION,
-	COMM_CBCODE_CS_SAVE_CALIBRATION,
-	COMM_CBCODE_CS_SET_CURRENT,
+	COMM_CBCODE_CS_SET_RANGE,                                 //04
+	COMM_CBCODE_CS_GET_CALIBRATION,                           //05
+	COMM_CBCODE_CS_VERIFY_CALIBRATION,                        //06
+	COMM_CBCODE_CS_SET_CALIBRATION,                           //07
+	COMM_CBCODE_CS_SAVE_CALIBRATION,                          //08
+	COMM_CBCODE_CS_SET_CURRENT,                               //09
 
-	COMM_CBCODE_VS_SET_RANGE,
-	COMM_CBCODE_VS_GET_CALIBRATION,
-	COMM_CBCODE_VS_VERIFY_CALIBRATION,
-	COMM_CBCODE_VS_SET_CALIBRATION,
-	COMM_CBCODE_VS_SAVE_CALIBRATION,
-	COMM_CBCODE_VS_SET_VOLTAGE,
+	COMM_CBCODE_VS_SET_RANGE,                                 //10
+	COMM_CBCODE_VS_GET_CALIBRATION,                           //11
+	COMM_CBCODE_VS_VERIFY_CALIBRATION,                        //12
+	COMM_CBCODE_VS_SET_CALIBRATION,                           //13
+	COMM_CBCODE_VS_SAVE_CALIBRATION,                          //14
+	COMM_CBCODE_VS_SET_VOLTAGE,                               //15
 
-	COMM_CBCODE_CM_SET_RANGE,
-	COMM_CBCODE_CM_GET_CALIBRATION,
-	COMM_CBCODE_CM_SET_CALIBRATION,
-	COMM_CBCODE_CM_SAVE_CALIBRATION,
-	COMM_CBCODE_CM_READ,
+	COMM_CBCODE_CM_SET_RANGE,                                 //16
+	COMM_CBCODE_CM_GET_CALIBRATION,                           //17
+	COMM_CBCODE_CM_SET_CALIBRATION,                           //18
+	COMM_CBCODE_CM_SAVE_CALIBRATION,                          //19
+	COMM_CBCODE_CM_READ,                                      //20
 
-	COMM_CBCODE_VM_SET_RANGE,
-	COMM_CBCODE_VM_GET_CALIBRATION,
-	COMM_CBCODE_VM_SET_CALIBRATION,
-	COMM_CBCODE_VM_SAVE_CALIBRATION,
-	COMM_CBCODE_VM_READ,
+	COMM_CBCODE_VM_SET_RANGE,                                 //21
+	COMM_CBCODE_VM_GET_CALIBRATION,                           //22
+	COMM_CBCODE_VM_SET_CALIBRATION,                           //23
+	COMM_CBCODE_VM_SAVE_CALIBRATION,                          //24
+	COMM_CBCODE_VM_READ,                                      //25
 
-	COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION,
+	COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION,                  //26
+	COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION,                  //27
+	COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION,                  //28
+	COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION,                  //29
 
-	COMM_CBCODE_RM_READ_AUTOSCALE,
+	COMM_CBCODE_RM_READ_AUTOSCALE,                            //30
 
-	COMM_CBCODE_SYSTEM_CONFIG_GET,
-	COMM_CBCODE_SYSTEM_CONFIG_SET,
-	COMM_CBCODE_SYSTEM_CONFIG_SAVE,
-	COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT,
+	COMM_CBCODE_SYSTEM_CONFIG_GET,                            //31
+	COMM_CBCODE_SYSTEM_CONFIG_SET,                            //32
+	COMM_CBCODE_SYSTEM_CONFIG_SAVE,                           //33
+	COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT,                   //34
 
-	COMM_CBCODE_VM2_SET_RANGE,
-	COMM_CBCODE_VM2_GET_CALIBRATION,
-	COMM_CBCODE_VM2_SET_CALIBRATION,
-	COMM_CBCODE_VM2_SAVE_CALIBRATION,
-	COMM_CBCODE_VM2_READ,
-	COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION,
+	COMM_CBCODE_VM2_SET_RANGE,                                //35
+	COMM_CBCODE_VM2_GET_CALIBRATION,                          //36
+	COMM_CBCODE_VM2_SET_CALIBRATION,                          //37
+	COMM_CBCODE_VM2_SAVE_CALIBRATION,                         //38
+	COMM_CBCODE_VM2_READ,                                     //39
+	COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION,                 //40
 
-	COMM_CBCODE_VM_SET_TERMINAL,
-	COMM_CBCODE_VM_GET_TERMINAL,
+	COMM_CBCODE_VM_SET_TERMINAL,                              //41
+	COMM_CBCODE_VM_GET_TERMINAL,                              //42
+	
+	COMM_CBCODE_CHANGE_BAUD,                                  //43
 };
 
 /******************************************************************/
@@ -2341,6 +2379,22 @@ private:
 };
 
 /******************************************************************/
+
+class CommCB_changeBaud : public CommCB
+{
+public:
+	CommCB_changeBaud (uint16_t baudRate) :
+		CommCB (COMM_CBCODE_CHANGE_BAUD),
+		baudRate_ (baudRate)
+	{}
+
+public:
+	uint16_t baudRate (void) const {return baudRate_;}
+
+private:
+	uint16_t baudRate_;
+};
+/******************************************************************/
 /******************************************************************/
 
 union CommCB_Union
@@ -2396,6 +2450,8 @@ union CommCB_Union
 
 	char vm6[sizeof (CommCB_VM_SetTerminal)];
 	char vm7[sizeof (CommCB_VM_GetTerminal)];
+	
+	char gen4[sizeof (CommCB_changeBaud)];
 };
 
 /******************************************************************/
@@ -2483,10 +2539,13 @@ public:
 
 	/********************************/
 	
-	void transmit_VM_setTerminal      (Comm_VM_Terminal terminal);
-	void transmit_VM_getTerminal      (void);
+	void transmit_VM_setTerminal (Comm_VM_Terminal terminal);
+	void transmit_VM_getTerminal (void);
 	
-
+	/********************************/
+	
+	void transmit_changeBaud     (uint16_t baudRate);
+	
 private:
 	QP4* qp4_;
 	FTDI* ftdi_;
@@ -2537,20 +2596,22 @@ private:
 
 	void RM_readAutoscaleCB (const void* data, uint16_t size);
 
-	void SystemConfig_GetCB (const void* data, uint16_t size);
-	void SystemConfig_SetCB (const void* data, uint16_t size);
-	void SystemConfig_SaveCB (const void* data, uint16_t size);
+	void SystemConfig_GetCB         (const void* data, uint16_t size);
+	void SystemConfig_SetCB         (const void* data, uint16_t size);
+	void SystemConfig_SaveCB        (const void* data, uint16_t size);
 	void SystemConfig_LoadDefaultCB (const void* data, uint16_t size);
 
-	void VM2_setRangeCB            (const void* data, uint16_t size);
-	void VM2_getCalibrationCB      (const void* data, uint16_t size);
-	void VM2_setCalibrationCB      (const void* data, uint16_t size);
-	void VM2_saveCalibrationCB     (const void* data, uint16_t size);
-	void VM2_readCB                (const void* data, uint16_t size);
+	void VM2_setRangeCB               (const void* data, uint16_t size);
+	void VM2_getCalibrationCB         (const void* data, uint16_t size);
+	void VM2_setCalibrationCB         (const void* data, uint16_t size);
+	void VM2_saveCalibrationCB        (const void* data, uint16_t size);
+	void VM2_readCB                   (const void* data, uint16_t size);
 	void VM2_loadDefaultCalibrationCB (const void* data, uint16_t size);
 
-	void VM_setTerminalCB     (const void* data, uint16_t size);
-	void VM_getTerminalCB     (const void* data, uint16_t size);
+	void VM_setTerminalCB (const void* data, uint16_t size);
+	void VM_getTerminalCB (const void* data, uint16_t size);
+	
+	void changeBaudCB     (const void* data, uint16_t size);
 
 private:
 	void transmit (const QP4_Packet* packet);

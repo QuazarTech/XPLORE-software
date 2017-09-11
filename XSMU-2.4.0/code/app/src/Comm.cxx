@@ -230,6 +230,8 @@ void Comm::interpret (const void* data, uint16_t size)
 
 		&Comm::VM_setTerminalCB,
 		&Comm::VM_getTerminalCB,
+		
+		&Comm::changeBaudCB,
 	};
 
 	if (size < sizeof (CommPacket))
@@ -722,8 +724,18 @@ void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 	const CommResponse_VM_GetTerminal* res =
 		reinterpret_cast<const CommResponse_VM_GetTerminal*> (data);
 
-	do_callback (new (&callbackObject_)
-		CommCB_VM_GetTerminal (res->terminal()));
+	do_callback (new (&callbackObject_) CommCB_VM_GetTerminal (res->terminal()));
+}
+
+void Comm::changeBaudCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_changeBaud))
+		return;
+
+	const CommResponse_changeBaud* res =
+		reinterpret_cast<const CommResponse_changeBaud*> (data);
+		
+	do_callback (new (&callbackObject_) CommCB_changeBaud (res->baudRate()));
 }
 
 /******************************************************************/
@@ -1354,6 +1366,21 @@ void Comm::transmit_VM_getTerminal (void)
 	qp4_->transmitter().free_packet (req);
 }
 
+/******************************************************************/
+
+void Comm::transmit_changeBaud (uint16_t baudRate)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_changeBaud));
+
+	new (req->body())
+		CommRequest_changeBaud (baudRate);
+	
+	req->seal();
+	transmit (req);
+	qp4_->transmitter().free_packet (req);
+}
 /******************************************************************/
 /******************************************************************/
 } // namespace smu
