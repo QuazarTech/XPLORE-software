@@ -1,0 +1,37 @@
+/*!
+* \mainpage LIBXSMU: XPlore source & measurement unit library and Python wrapper
+*
+* The following is a python illustration of
+* XPlore lockin amplifier control using libxlia.
+* Please refer to \ref libxsmu.h for complete documentation.
+*
+* \include CM_getCalibration.py
+* \include CM_loadDefaultCalibration.py
+* \include CM_saveCalibration.py
+* \include CM_setCalibration.py
+* \include CM_setRange.py
+* \include CS_getCalibration.py
+* \include CS_loadDefaultCalibration.py
+* \include CS_saveCalibration.py
+* \include CS_setCalibration.py
+* \include CS_setCurrent.py
+* \include CS_setRange.py
+* \include CS_verifyCalibration.py
+* \include setSourceModeCS.py
+* \include setSourceModeVS.py
+* \include VM_getCalibration.py
+* \include VM_loadDefaultCalibration.py
+* \include VM_saveCalibration.py
+* \include VM_setCalibration.py
+* \include VM_setRange.py
+* \include VS_getCalibration.py
+* \include VS_loadDefaultCalibration.py
+* \include VS_saveCalibration.py
+* \include VS_setCalibration.py
+* \include VS_setRange.py
+* \include VS_setVoltage.py
+* \include VS_verifyCalibration.py
+* \include RM_getReadingAutoscale.py
+*
+*/
+

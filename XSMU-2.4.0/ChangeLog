@@ -1,0 +1,32 @@
+------------------------------------------------------------------------
+r6 | (no author) | 2013-08-30 12:51:38 +0530 (Fri, 30 Aug 2013) | 4 lines
+
+** It was noticed that if an ftdi interface was opened as a serial port, i.e. using /dev/ttyUSB*, FTDI.cxx was unable to communicate using that interface. There seemed to be a problem the way ftdi was being initialized. After going through a few example in net, the initialization sequence in FTDI.cxx has been corrected. Now the interface can be used even if it has been accessed through /dev/ttyUSB*.
+
+-- Krish.
+
+------------------------------------------------------------------------
+r5 | (no author) | 2013-05-27 19:19:46 +0530 (Mon, 27 May 2013) | 2 lines
+
+** Resistance measurement with autoscaling has been added.
+
+------------------------------------------------------------------------
+r4 | (no author) | 2013-05-16 20:11:50 +0530 (Thu, 16 May 2013) | 1 line
+
+More python test programs have been added.
+------------------------------------------------------------------------
+r3 | (no author) | 2013-05-13 14:15:18 +0530 (Mon, 13 May 2013) | 4 lines
+
+** Four new commands, viz. CS_loadDefaultCalibration, VS_loadDefaultCalibration, CM_loadDefaultCalibration, VM_loadDefaultCalibration, have been added.
+
+** Names of some functions have been changed. For example, do_CS_setCurrent and set_CS_Current have been changed to CS_setCurrnet.
+
+------------------------------------------------------------------------
+r2 | (no author) | 2013-05-09 19:05:55 +0530 (Thu, 09 May 2013) | 1 line
+
+ChangeLog added.
+------------------------------------------------------------------------
+r1 | (no author) | 2013-05-09 19:05:33 +0530 (Thu, 09 May 2013) | 1 line
+
+Trunk created. A working driver has been added.
+------------------------------------------------------------------------
