@@ -7,6 +7,33 @@
 
 ### 2.4.0
 
+2017-09-12  Gitansh Kataria  <gitansh@quazartech.com>
+
+* Feature: A command to change baud-rate is added.
+
+* virtuaSMU.h/virtuaSMU.cxx:
+
+	^^ class Driver
+		++ uint32_t baudRate_
+		++ void changeBaud (uint32_t*, float*);
+		++ void changeBaudCB (CommCB*);
+
+* libxsmu.h/libxsmu.cxx:
+
+	++ void changeBaud (int, unsigned int, float,
+				unsigned int*, float*);
+
+* libxsmu.i:
+
+	++ void changeBaud (int, unsigned int, float,
+				unsigned int*, float*);
+	++ void changeBaud (int, unsigned int, float,
+				unsigned int*, float*);
+
+------------------------------------------------------------------------
+
+### 2.4.0
+
 2017-09-11  Gitansh Kataria  <gitansh@quazartech.com>
 
 * Feature: A command to change baud-rate is added.

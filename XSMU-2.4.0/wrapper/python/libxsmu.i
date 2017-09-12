@@ -205,9 +205,13 @@ extern void VM_getTerminal(int deviceID,
 
 /**************************************************************/
 
-%}
+extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+						  unsigned int *ret_baudRate, float *ret_timeout);
 
 /**************************************************************/
+
+%}
+
 /**************************************************************/
 /**************************************************************/
 
@@ -380,5 +384,10 @@ extern void VM_getTerminal(int deviceID, float timeout,
 						unsigned int *OUTPUT, float *OUTPUT);
 
 /**************************************************************/
-/**************************************************************/
 
+extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+						  unsigned int *OUTPUT, float *OUTPUT);
+
+
+/**************************************************************/
+/**************************************************************/

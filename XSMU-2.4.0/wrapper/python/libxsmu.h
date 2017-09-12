@@ -6,17 +6,19 @@ extern "C" {
 #endif
 
 /**
- * \brief Scans USB bus for XPLORE lock-in amplifier.
+ * \brief Scans USB bus for XPLORE Source-Meter Unit.
  *
- * \return Number of XPLORE lock-in amplifier found.
+ * \return Number of XPLORE Source-Meter Unit found.
  *
  * This function must be called first. It creates an internal
- * list of XPLORE lock-in amplifier hardware, whose details,
+ * list of XPLORE Source-Meter Unit hardware, whose details,
  * e.g. serial number etc., can then be accessed by other functions,
  * e.g. \ref serialNo.
  *
  */
 int scan(void);
+
+/**************************************************************/
 
 /**
  * \brief Returns the serial number of a previously scanned device.
@@ -59,6 +61,8 @@ const char *serialNo(int i);
 int open_device(const char *serialNo,
 				float timeout,
 				unsigned int *ret_goodID, float *ret_timeout);
+
+/**************************************************************/
 
 /**
  * \brief Closes a previously opened device.
@@ -245,6 +249,9 @@ void VM_getTerminal(int deviceID, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout);
 
 /**************************************************************/
+
+void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+				unsigned int *ret_baudRate, float *ret_timeout);
 
 #ifdef __cplusplus
 }				// extern "C"

@@ -568,6 +568,17 @@ void Driver::VM_getTerminalCB (const CommCB* oCB)
 }
 
 /***************************************************************************/
+
+void Driver::changeBaudCB (const CommCB* oCB)
+{
+	const CommCB_changeBaud* o =
+	reinterpret_cast<const CommCB_changeBaud*> (oCB);
+
+	baudRate_ =  o->baudRate();
+	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
+}
+
+/***************************************************************************/
 /***************************************************************************/
 
 void Driver::open (const char* serialNo, float* timeout)
@@ -1212,6 +1223,18 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 
 	if (waitForResponse (COMM_CBCODE_VM_GET_TERMINAL, timeout))
 		*terminal = (vm_->terminal());
+}
+
+/***************************************************************************/
+/***************************************************************************/
+
+void Driver::changeBaud (uint32_t* baudRate, float* timeout)
+{
+	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
+	comm_->transmit_changeBaud (*baudRate);
+
+	if (waitForResponse (COMM_CBCODE_CHANGE_BAUD, timeout))
+		*baudRate = baudRate_;
 }
 
 /***************************************************************************/

@@ -165,7 +165,10 @@ class Driver {
 	void VM_getTerminal (VM_Terminal* terminal, float* timeout);
 
 	/***************************************************/
-
+	
+	void changeBaud (uint32_t* baudRate, float* timeout);
+	
+	/***************************************************/
  public:
 	bool goodID (void) const;
 	const char* identity (void) const {
@@ -232,6 +235,8 @@ class Driver {
 
 	void VM_setTerminalCB (const CommCB* oCB);
 	void VM_getTerminalCB (const CommCB* oCB);
+	
+	void changeBaudCB (const CommCB* oCB);
 
  private:
 	Comm* comm_;
@@ -245,12 +250,13 @@ class Driver {
 	VersionInfo* versionInfo_;
 	AckBits ackBits_;
 	std::string identity_;
+	uint32_t baudRate_;
 };
 
 /************************************************************************/
 /************************************************************************/
 
-} // namespae smu
+} // namespace smu
 
 typedef smu::Driver VirtuaSMU;
 
