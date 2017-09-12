@@ -9,6 +9,16 @@
 
 2017-09-12  Gitansh Kataria  <gitansh@quazartech.com>
 
+* Feature: Python test file for changeBaud() function
+
+++ changeBaud.py
+
+------------------------------------------------------------------------
+
+### 2.4.0
+
+2017-09-12  Gitansh Kataria  <gitansh@quazartech.com>
+
 * Feature: A command to change baud-rate is added.
 
 * virtuaSMU.h/virtuaSMU.cxx:
