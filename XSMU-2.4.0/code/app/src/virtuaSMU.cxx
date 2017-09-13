@@ -306,15 +306,15 @@ void Driver::VS_saveCalibrationCB (const CommCB* oCB)
 
 void Driver::VS_setVoltageCB (const CommCB* oCB)
 {
-	std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
+	//std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
 	const CommCB_VS_SetVoltage* o =
 	reinterpret_cast<const CommCB_VS_SetVoltage*> (oCB);
 
 	vs_->setVoltage (o->voltage());
-	std::cout << "virtuaSMU : Retrieved Set Voltage" << std::endl;
+	//std::cout << "virtuaSMU : Retrieved Set Voltage" << std::endl;
 	
 	ackBits_.set (COMM_CBCODE_VS_SET_VOLTAGE);
-	std::cout << "virtuaSMU : AckBits Set" << std::endl;
+	//std::cout << "virtuaSMU : AckBits Set" << std::endl;
 }
 
 /***************************************************************************/
@@ -575,16 +575,16 @@ void Driver::VM_getTerminalCB (const CommCB* oCB)
 
 void Driver::changeBaudCB (const CommCB* oCB)
 {
-	std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
+	//std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
 	
 	const CommCB_changeBaud* o =
 	reinterpret_cast<const CommCB_changeBaud*> (oCB);
 
 	baudRate_ =  o->baudRate();
-	std::cout << "virtuaSMU : Retrieved baudRate" << std::endl;
+	//std::cout << "virtuaSMU : Retrieved baudRate" << std::endl;
 	
 	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
-	std::cout << "virtuaSMU : AckBits Set" << std::endl;
+	//std::cout << "virtuaSMU : AckBits Set" << std::endl;
 }
 
 /***************************************************************************/
@@ -870,13 +870,13 @@ void Driver::VS_saveCalibration (float* timeout)
 void Driver::VS_setVoltage (float* voltage, float* timeout)
 {
 	ackBits_.reset (COMM_CBCODE_VS_SET_VOLTAGE);
-	std::cout << "virtuaSMU : AckBits Reset" << std::endl;
+	//std::cout << "virtuaSMU : AckBits Reset" << std::endl;
 	
 	comm_->transmit_VS_setVoltage (*voltage);
-	std::cout << "virtuaSMU : Transmitted setVoltage, Starting wait for response" << std::endl;
+	//std::cout << "virtuaSMU : Transmitted setVoltage, Starting wait for response" << std::endl;
 
 	if (waitForResponse (COMM_CBCODE_VS_SET_VOLTAGE, timeout))
-		std::cout << "virtuaSMU : Recieved Response" << std::endl;
+	//	std::cout << "virtuaSMU : Recieved Response" << std::endl;
 		*voltage = vs_->voltage();
 }
 
@@ -1244,13 +1244,13 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
-	std::cout << "virtuaSMU : AckBits Reset" << std::endl;
+	//std::cout << "virtuaSMU : AckBits Reset" << std::endl;
 	
 	comm_->transmit_changeBaud (*baudRate);
-	std::cout << "virtuaSMU : Transmitted baudRate, Starting wait for response" << std::endl;
+	//std::cout << "virtuaSMU : Transmitted baudRate, Starting wait for response" << std::endl;
 
 	if (waitForResponse (COMM_CBCODE_CHANGE_BAUD, timeout))
-		std::cout << "virtuaSMU : Recieved Response" << std::endl;
+	//	std::cout << "virtuaSMU : Recieved Response" << std::endl;
 		*baudRate = baudRate_;
 }
 

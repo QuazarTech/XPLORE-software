@@ -31,7 +31,7 @@ if (timeout == 0.0) or (not goodID):
 ##########################################################################
 # Set voltage source calibration table (for range selected above.)
 
-timeout = 1.0
+timeout = 5.0
 voltage = float(sys.argv[1]) #-10.0
 voltage, timeout = libxsmu.VS_setVoltage (deviceID, voltage, timeout)
 print \
