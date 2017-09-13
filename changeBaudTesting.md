@@ -151,5 +151,11 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 	^^ checkRecieveQueue()
 		++ std::cout << "Comm : Recieved Data Size : " << rxsize << std::endl;
 
+- Looked at XPLORE-firmware Changelog, and realised that I haven't written functions to interface the firmware's (XPLORE-firmware) Comm.cxx to the driver (XPLORE-software). Adding the required functions in XPLORE-firmware, and updating its Changelog.
+
+- Also changing `timeout` to 5 seconds in `XPLORE-software/wrapper/python/test/changeBaud.py`
+
+- Redoing **Test-1** with the above mentioned modifications.
+
 ##### Result :
 
