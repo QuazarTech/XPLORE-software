@@ -157,5 +157,10 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 - Redoing **Test-1** with the above mentioned modifications.
 
-##### Result :
+##### Result : Communication Timeout
+
+- Adding print statements increased the execution time, and the default timeout of 1 second is not sufficient. Retrying with the all print statements commited out.
+
+##### Result : Communication Timeout
+
 
