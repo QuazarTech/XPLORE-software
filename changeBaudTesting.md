@@ -107,7 +107,7 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 ++ changeBaud.py
 
-### Testing
+### Test-1
 
 - Burn modified Firmware onto the SMU microcontroller (Follow : `XPLORE-firmware` README )
 - Install modified software on computer (Follow : `XPLORE-software` README)
@@ -117,3 +117,39 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
   - Navigate to `XPLORE-software/XSMU-2.4.0/wrapper/python/tests/`
   - Run `python changeBaud.py`
   - Expected Result : Control should return back to python within specified timeout (1 second)
+
+##### Result : Failed
+
+- Output : Communication Timeout in changeBaud
+
+
+##### Debugging
+
+- Add print statements to XPLORE-software part and use LCD to print from the XPLORE-firmware part
+
+^^ virtuaSMU.cxx
+	^^ void Driver::changeBaudCB (const CommCB*)
+		++ std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
+		++ std::cout << "virtuaSMU : Retrieved baudRate" << std::endl;
+		++ std::cout << "virtuaSMU : AckBits Set" << std::endl;
+		
+	^^ void Driver::changeBaud (uint32_t*, float*)
+		++ std::cout << "virtuaSMU : AckBits Reset" << std::endl;
+		++ std::cout << "virtuaSMU : Transmitted baudRate, Starting wait for response" << std::endl;
+		++ std::cout << "virtuaSMU : Recieved Response" << std::endl;
+		
+^^ Comm.cxx
+	^^ void Comm::changeBaudCB (const void* data, uint16_t size)
+		++ std::cout << "Comm : Packet Size Smaller than Expected" << std::endl;
+		++ std::cout << "Comm : Packet Size Okay" << std::endl;
+		++ std::cout << "Comm : Callback Completed" << std::endl;
+
+	^^ void Comm::transmit_changeBaud (uint32_t baudRate)
+		++ std::cout << "Comm : QP4_Packet allocated" << std::endl;
+		++ std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
+	
+	^^ checkRecieveQueue()
+		++ std::cout << "Comm : Recieved Data Size : " << rxsize << std::endl;
+
+##### Result :
+

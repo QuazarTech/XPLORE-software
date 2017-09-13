@@ -149,6 +149,7 @@ void Comm::checkReceiveQueue (void)
 	uint32_t rxsize;
 
 	while ((rxsize = ftdi_->read (rxbuf, sizeof (rxbuf))))
+		std::cout << "Comm : Recieved Data Size : " << rxsize << std::endl;
 		processReceivedData (rxbuf, rxsize);
 }
 
@@ -730,12 +731,15 @@ void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 void Comm::changeBaudCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_changeBaud))
+		std::cout << "Comm : Packet Size Smaller than Expected" << std::endl;
 		return;
+	std::cout << "Comm : Packet Size Okay" << std::endl;
 
 	const CommResponse_changeBaud* res =
 		reinterpret_cast<const CommResponse_changeBaud*> (data);
 		
 	do_callback (new (&callbackObject_) CommCB_changeBaud (res->baudRate()));
+	std::cout << "Comm : Callback Completed" << std::endl;
 }
 
 /******************************************************************/
@@ -1373,12 +1377,15 @@ void Comm::transmit_changeBaud (uint32_t baudRate)
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_changeBaud));
+	std::cout << "Comm : QP4_Packet allocated" << std::endl;
 
 	new (req->body())
 		CommRequest_changeBaud (baudRate);
 	
 	req->seal();
 	transmit (req);
+	std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
+	
 	qp4_->transmitter().free_packet (req);
 }
 /******************************************************************/

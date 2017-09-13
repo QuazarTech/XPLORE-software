@@ -571,11 +571,16 @@ void Driver::VM_getTerminalCB (const CommCB* oCB)
 
 void Driver::changeBaudCB (const CommCB* oCB)
 {
+	std::cout << "virtuaSMU : Entering changeBaudCB" << std::endl;
+	
 	const CommCB_changeBaud* o =
 	reinterpret_cast<const CommCB_changeBaud*> (oCB);
 
 	baudRate_ =  o->baudRate();
+	std::cout << "virtuaSMU : Retrieved baudRate" << std::endl;
+	
 	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
+	std::cout << "virtuaSMU : AckBits Set" << std::endl;
 }
 
 /***************************************************************************/
@@ -1231,9 +1236,13 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
+	std::cout << "virtuaSMU : AckBits Reset" << std::endl;
+	
 	comm_->transmit_changeBaud (*baudRate);
+	std::cout << "virtuaSMU : Transmitted baudRate, Starting wait for response" << std::endl;
 
 	if (waitForResponse (COMM_CBCODE_CHANGE_BAUD, timeout))
+		std::cout << "virtuaSMU : Recieved Response" << std::endl;
 		*baudRate = baudRate_;
 }
 
