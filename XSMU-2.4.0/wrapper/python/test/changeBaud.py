@@ -31,7 +31,7 @@ if (timeout == 0.0) or (not goodID):
 ##########################################################################
 # Set voltage source calibration table (for range selected above.)
 
-timeout = 1.0
+timeout = 5.0
 baudRate = 9600
 baudRate, timeout = libxsmu.changeBaud (deviceID, baudRate, timeout)
 print \
