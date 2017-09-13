@@ -228,3 +228,102 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 	Timeout:  0.0
 	Communication timeout in changeBaud
 	```
+---
+
+- Added print statements to VS_setVoltage functions to see internal working
+
+##### Result : Failed
+
+- Output : timeout error even in setVoltage functions, reason being printing these statements lead to execution time exceeding the timeout.
+---
+
+- Added print statement in virtuaSMU.cxx (software), to see the characters and corresponding hex numbers being transmitted.
+
+##### Result : Timeout
+
+- Output :
+
+```
+libxsmu version: 2.1.2
+Total device: 1
+Seial number: XSMU012A
+libxsmu version: 2.1.2
+51 Q
+50 P
+34 4
+31 1
+0 
+2C ,
+F9 �
+12 
+0 
+1 
+0 
+0 
+58 X
+50 P
+4C L
+4F O
+52 R
+45 E
+20  
+53 S
+4D M
+55 U
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+4 
+0 
+0 
+FF �
+FF �
+FF �
+FD �
+Hardware version: 4.0.0
+Firmware version: 255.255.253
+Device ID     : 0 
+goodID        : 1 
+Remaining time: 0.889459848404 sec 
+
+51 Q
+50 P
+34 4
+31 1
+0 
+8 
+FF �
+30 0
+0 
+2B +
+0 
+0 
+0 
+0 
+25 %
+80 �
+Baud Rate:  9600 
+Timeout:  0.0
+Communication timeout in changeBaud
+```
+
