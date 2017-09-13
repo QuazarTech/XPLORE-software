@@ -122,6 +122,7 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 - Output : Communication Timeout in changeBaud
 
+---
 
 ##### Debugging
 
@@ -159,9 +160,17 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 ##### Result : Communication Timeout
 
+- Output : Communication Timeout in changeBaud
+
+---
+
 - Adding print statements increased the execution time, and the default timeout of 1 second is not sufficient. Retrying with the all print statements commited out.
 
 ##### Result : Communication Timeout
+
+- Output : Communication Timeout in changeBaud
+
+---
 
 - 	Added LCD print statements to firmware (Application.cxx) inside Application::changeBaudCB() function
 	
@@ -192,27 +201,30 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 ##### Result : Failed
 
-##### Output :
-```
-libxsmu version: 2.1.2
-Total device: 1
-Seial number: XSMU012A
-libxsmu version: 2.1.2
-Hardware version: 4.0.0
-Firmware version: 255.255.253
-Device ID     : 0 
-goodID        : 1 
-Remaining time: 0.887270927429 sec 
+- Output :
 
-virtuaSMU : AckBits Reset
-Comm : QP4_Packet allocated
-Comm : Packet Sealed and Transmitted
-virtuaSMU : Transmitted baudRate, Starting wait for response
-```
-On LCD -> "Entering changeBaudCB"
-On LCD -> "Transmitted changeBaud"
-```
-Baud Rate:  9600 
-Timeout:  0.0
-Communication timeout in changeBaud
-```
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.887270927429 sec 
+
+	virtuaSMU : AckBits Reset
+	Comm : QP4_Packet allocated
+	Comm : Packet Sealed and Transmitted
+	virtuaSMU : Transmitted baudRate, Starting wait for response
+	```
+
+	On LCD -> "Entering changeBaudCB"
+	On LCD -> "Transmitted changeBaud"
+
+	```
+	Baud Rate:  9600 
+	Timeout:  0.0
+	Communication timeout in changeBaud
+	```
