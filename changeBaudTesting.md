@@ -163,4 +163,31 @@ The SMU is to stream voltmeter data at a specified frequency. This requires foll
 
 ##### Result : Communication Timeout
 
+- 	Added LCD print statements to firmware (Application.cxx) inside Application::changeBaudCB() function
+	
+	```
+	freezeLocalDisplay();
+	lcd.cursorAt (0, 0);
+	lcd << "    Entering    ";
 
+	lcd.cursorAt (1, 0);
+	lcd << "  changeBaudCB  ";
+
+
+	const CommCB_changeBaud* o =
+		reinterpret_cast<const CommCB_changeBaud*> (oCB);
+	
+	baudRate = o->baudRate();
+	appComm.transmit_changeBaud (baudRate);
+	
+	
+	freezeLocalDisplay();
+	lcd.cursorAt (0, 0);
+	lcd << "  Transmitted   ";
+
+	lcd.cursorAt (1, 0);
+	lcd << "   changeBaud   ";
+	```
+}
+
+##### Result :
