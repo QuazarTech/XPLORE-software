@@ -1,5 +1,6 @@
 #include "../app/Comm.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -159,6 +160,7 @@ void Comm::processReceivedData (const void* data, uint16_t size)
 
 	if (size) do {
 
+		std::printf ("%X %c\n", static_cast<unsigned> (*src), *src);
 		qp4_->receiver().push_back (*src++);
 
 		if (qp4_->receiver().ready()) {
@@ -231,7 +233,7 @@ void Comm::interpret (const void* data, uint16_t size)
 
 		&Comm::VM_setTerminalCB,
 		&Comm::VM_getTerminalCB,
-		
+
 		&Comm::changeBaudCB,
 	};
 
@@ -740,7 +742,7 @@ void Comm::changeBaudCB (const void* data, uint16_t size)
 
 	const CommResponse_changeBaud* res =
 		reinterpret_cast<const CommResponse_changeBaud*> (data);
-		
+
 	do_callback (new (&callbackObject_) CommCB_changeBaud (res->baudRate()));
 	//std::cout << "Comm : Callback Completed" << std::endl;
 }
@@ -1387,11 +1389,11 @@ void Comm::transmit_changeBaud (uint32_t baudRate)
 
 	new (req->body())
 		CommRequest_changeBaud (baudRate);
-	
+
 	req->seal();
 	transmit (req);
 	//std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
-	
+
 	qp4_->transmitter().free_packet (req);
 }
 /******************************************************************/

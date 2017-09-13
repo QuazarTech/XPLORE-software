@@ -64,7 +64,7 @@ enum Comm_Opcode
 	COMM_OPCODE_VM2_LOAD_DEFAULT_CALIBRATION,                       //40
 	COMM_OPCODE_VM_SET_TERMINAL,                                    //41
 	COMM_OPCODE_VM_GET_TERMINAL,                                    //42
-	
+
 	COMM_OPCODE_CHANGE_BAUD,                                        //43
 };
 
@@ -1577,7 +1577,7 @@ class CommRequest_changeBaud : public CommPacket_changeBaud
 {
 public:
 	CommRequest_changeBaud (uint32_t baudRate) :
-		baudRate_(baudRate)
+		baudRate_ (smu::hton (baudRate))
 	{}
 
 private:
@@ -1653,7 +1653,7 @@ enum Comm_CallbackCode
 
 	COMM_CBCODE_VM_SET_TERMINAL,                              //41
 	COMM_CBCODE_VM_GET_TERMINAL,                              //42
-	
+
 	COMM_CBCODE_CHANGE_BAUD,                                  //43
 };
 
@@ -2401,6 +2401,7 @@ union CommCB_Union
 	char gen1[sizeof (CommCB_Identity)];
 	char gen2[sizeof (CommCB_Sync)];
 	char gen3[sizeof (CommCB_SetSourceMode)];
+	char gen4[sizeof (CommCB_changeBaud)];
 
 	char cs0[sizeof (CommCB_CS_SetRange)];
 	char cs1[sizeof (CommCB_CS_GetCalibration)];
@@ -2448,8 +2449,6 @@ union CommCB_Union
 
 	char vm6[sizeof (CommCB_VM_SetTerminal)];
 	char vm7[sizeof (CommCB_VM_GetTerminal)];
-	
-	char gen4[sizeof (CommCB_changeBaud)];
 };
 
 /******************************************************************/
@@ -2536,14 +2535,14 @@ public:
 	void transmit_VM2_loadDefaultCalibration (void);
 
 	/********************************/
-	
+
 	void transmit_VM_setTerminal (Comm_VM_Terminal terminal);
 	void transmit_VM_getTerminal (void);
-	
+
 	/********************************/
-	
+
 	void transmit_changeBaud     (uint32_t baudRate);
-	
+
 private:
 	QP4* qp4_;
 	FTDI* ftdi_;
@@ -2608,7 +2607,7 @@ private:
 
 	void VM_setTerminalCB (const void* data, uint16_t size);
 	void VM_getTerminalCB (const void* data, uint16_t size);
-	
+
 	void changeBaudCB     (const void* data, uint16_t size);
 
 private:
