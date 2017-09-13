@@ -412,13 +412,16 @@ void Comm::VS_saveCalibrationCB (const void* data, uint16_t size)
 void Comm::VS_setVoltageCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_VS_SetVoltage))
+		std::cout << "Comm : Packet Size Smaller than Expected" << std::endl;
 		return;
+	std::cout << "Comm : Packet Size Okay" << std::endl;
 
 	const CommResponse_VS_SetVoltage* res =
 		reinterpret_cast <const CommResponse_VS_SetVoltage*> (data);
 
 	do_callback (new (&callbackObject_)
 		CommCB_VS_SetVoltage (res->voltage()));
+	std::cout << "Comm : Callback Completed" << std::endl;
 }
 
 /******************************************************************/
@@ -960,12 +963,15 @@ void Comm::transmit_VS_setVoltage (float voltage)
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_VS_SetVoltage));
+	std::cout << "Comm : QP4_Packet allocated" << std::endl;
 
 	new (req->body())
 		CommRequest_VS_SetVoltage (voltage);
 
 	req->seal();
 	transmit (req);
+	std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
+
 	qp4_->transmitter().free_packet (req);
 }
 
