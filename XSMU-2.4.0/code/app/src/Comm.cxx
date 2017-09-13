@@ -5,6 +5,9 @@
 #include <cstring>
 #include <iostream>
 
+#define PRINT_DEBUG(x) { \
+std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":" << x << std::endl; }
+
 using namespace std;
 
 namespace smu {
@@ -243,6 +246,8 @@ void Comm::interpret (const void* data, uint16_t size)
 	const CommPacket *packet =
 		reinterpret_cast<const CommPacket *> (data);
 
+	PRINT_DEBUG ("Opcode: " << packet->opcode());
+
 	if (packet->opcode() < sizeof (cbs) / sizeof (cbs[0]))
 		(this->*cbs[packet->opcode()])(data, size);
 }
@@ -414,16 +419,13 @@ void Comm::VS_saveCalibrationCB (const void* data, uint16_t size)
 void Comm::VS_setVoltageCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_VS_SetVoltage))
-		//std::cout << "Comm : Packet Size Smaller than Expected" << std::endl;
 		return;
-	//std::cout << "Comm : Packet Size Okay" << std::endl;
 
 	const CommResponse_VS_SetVoltage* res =
 		reinterpret_cast <const CommResponse_VS_SetVoltage*> (data);
 
 	do_callback (new (&callbackObject_)
 		CommCB_VS_SetVoltage (res->voltage()));
-	//std::cout << "Comm : Callback Completed" << std::endl;
 }
 
 /******************************************************************/
@@ -735,16 +737,19 @@ void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 
 void Comm::changeBaudCB (const void* data, uint16_t size)
 {
-	if (size < sizeof (CommResponse_changeBaud))
-		//std::cout << "Comm : Packet Size Smaller than Expected" << std::endl;
+	if (size < sizeof (CommResponse_changeBaud)) {
+
+		PRINT_DEBUG ("Comm : Packet Size Smaller than Expected")
 		return;
-	//std::cout << "Comm : Packet Size Okay" << std::endl;
+	}
+
+	PRINT_DEBUG ("Comm : Packet Size Okay");
 
 	const CommResponse_changeBaud* res =
 		reinterpret_cast<const CommResponse_changeBaud*> (data);
 
 	do_callback (new (&callbackObject_) CommCB_changeBaud (res->baudRate()));
-	//std::cout << "Comm : Callback Completed" << std::endl;
+	PRINT_DEBUG ("Comm : Callback Completed");
 }
 
 /******************************************************************/
@@ -1385,14 +1390,14 @@ void Comm::transmit_changeBaud (uint32_t baudRate)
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_changeBaud));
-	//std::cout << "Comm : QP4_Packet allocated" << std::endl;
+	PRINT_DEBUG ("Comm : QP4_Packet allocated");
 
 	new (req->body())
 		CommRequest_changeBaud (baudRate);
 
 	req->seal();
 	transmit (req);
-	//std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
+	PRINT_DEBUG ("Comm : Packet Sealed and Transmitted");
 
 	qp4_->transmitter().free_packet (req);
 }
