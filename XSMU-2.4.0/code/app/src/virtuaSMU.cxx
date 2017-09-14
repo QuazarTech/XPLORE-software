@@ -134,6 +134,8 @@ void Driver::comm_cb (const CommCB* oCB)
 
 		&Driver::VM_setTerminalCB,
 		&Driver::VM_getTerminalCB,
+
+		&Driver::changeBaudCB,
 	};
 
 	if (oCB->code() < sizeof (cbs) / sizeof (cbs[0]))
