@@ -812,7 +812,7 @@ void VM_setTerminal(int deviceID, int terminal, float timeout,
 	virtuaSMU->VM_setTerminal(&terminal_, &timeout_);
 
 	*ret_terminal = 0;
-	
+
 	if ((*ret_timeout = timeout_) == 0)
 		return;
 
@@ -831,7 +831,7 @@ void VM_getTerminal(int deviceID, float timeout,
 	virtuaSMU->VM_getTerminal(&terminal_, &timeout_);
 
 	*ret_terminal = 0;
-	
+
 	if ((*ret_timeout = timeout_) == 0)
 		return;
 
@@ -844,23 +844,18 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 				unsigned int *ret_baudRate, float *ret_timeout)
 {
 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
-	
+
 	unsigned int baudRate_ = baudRate;
 	float timeout_ = timeout;
-        
-        std::cerr << "libxsmu changeBaud " << baudRate_ << " " << timeout_ << std::endl;
-	
+
 	virtuaSMU->changeBaud (&baudRate_, &timeout_);
-	
+
 	*ret_baudRate = 9600;
-	
+
 	if ((*ret_timeout = timeout_) == 0)
-        {       std::cerr << "libxsmu timeout " << baudRate_ << " " << timeout_ << std::endl;
-		return;
-        }
-        
+        return;
+
 	*ret_baudRate = baudRate_;
-        std::cerr << "libxsmu success" << baudRate_ << " " << timeout_ << std::endl;
 }
 /********************************************************************/
 /********************************************************************/
