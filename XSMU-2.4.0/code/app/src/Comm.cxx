@@ -246,7 +246,7 @@ void Comm::interpret (const void* data, uint16_t size)
 	const CommPacket *packet =
 		reinterpret_cast<const CommPacket *> (data);
 
-	PRINT_DEBUG ("Opcode: " << packet->opcode());
+	//PRINT_DEBUG ("Opcode: " << packet->opcode());
 
 	if (packet->opcode() < sizeof (cbs) / sizeof (cbs[0]))
 		(this->*cbs[packet->opcode()])(data, size);
@@ -739,17 +739,17 @@ void Comm::changeBaudCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_changeBaud)) {
 
-		PRINT_DEBUG ("Comm : Packet Size Smaller than Expected")
+		//PRINT_DEBUG ("Comm : Packet Size Smaller than Expected")
 		return;
 	}
 
-	PRINT_DEBUG ("Comm : Packet Size Okay");
+	//PRINT_DEBUG ("Comm : Packet Size Okay");
 
 	const CommResponse_changeBaud* res =
 		reinterpret_cast<const CommResponse_changeBaud*> (data);
 
 	do_callback (new (&callbackObject_) CommCB_changeBaud (res->baudRate()));
-	PRINT_DEBUG ("Comm : Callback Completed");
+	//PRINT_DEBUG ("Comm : Callback Completed");
 }
 
 /******************************************************************/
@@ -1390,14 +1390,14 @@ void Comm::transmit_changeBaud (uint32_t baudRate)
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_changeBaud));
-	PRINT_DEBUG ("Comm : QP4_Packet allocated");
+	//PRINT_DEBUG ("Comm : QP4_Packet allocated");
 
 	new (req->body())
 		CommRequest_changeBaud (baudRate);
 
 	req->seal();
 	transmit (req);
-	PRINT_DEBUG ("Comm : Packet Sealed and Transmitted");
+	//PRINT_DEBUG ("Comm : Packet Sealed and Transmitted");
 
 	qp4_->transmitter().free_packet (req);
 }

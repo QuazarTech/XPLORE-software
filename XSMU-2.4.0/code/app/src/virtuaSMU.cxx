@@ -578,16 +578,16 @@ void Driver::VM_getTerminalCB (const CommCB* oCB)
 
 void Driver::changeBaudCB (const CommCB* oCB)
 {
-	PRINT_DEBUG ("virtuaSMU : Entering changeBaudCB");
+	//PRINT_DEBUG ("virtuaSMU : Entering changeBaudCB");
 
 	const CommCB_changeBaud* o =
 	reinterpret_cast<const CommCB_changeBaud*> (oCB);
 
 	baudRate_ =  o->baudRate();
-	PRINT_DEBUG ("virtuaSMU : Retrieved baudRate");
+	//PRINT_DEBUG ("virtuaSMU : Retrieved baudRate");
 
 	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
-	PRINT_DEBUG ("virtuaSMU : AckBits Set");
+	//PRINT_DEBUG ("virtuaSMU : AckBits Set");
 }
 
 /***************************************************************************/
@@ -1243,14 +1243,14 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
-	PRINT_DEBUG ("virtuaSMU : AckBits Reset");
+	//PRINT_DEBUG ("virtuaSMU : AckBits Reset");
 
 	comm_->transmit_changeBaud (*baudRate);
-	PRINT_DEBUG("virtuaSMU : Transmitted baudRate, Starting wait for response");
+	//PRINT_DEBUG("virtuaSMU : Transmitted baudRate, Starting wait for response");
 
 	if (waitForResponse (COMM_CBCODE_CHANGE_BAUD, timeout))
 	{
-		PRINT_DEBUG ("virtuaSMU : Recieved Response");
+		//PRINT_DEBUG ("virtuaSMU : Recieved Response");
 		*baudRate = baudRate_;
 	}
 }
