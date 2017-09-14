@@ -417,3 +417,102 @@ Baud Rate:  9600
 Timeout:  0.0
 Communication timeout in changeBaud
 ```
+---
+
+```
+libxsmu version: 2.1.2
+Total device: 1
+Seial number: XSMU012A
+libxsmu version: 2.1.2
+51 Q
+50 P
+34 4
+31 1
+0 
+2C ,
+F9 �
+12 
+0 
+1 
+0 
+0 
+58 X
+50 P
+4C L
+4F O
+52 R
+45 E
+20  
+53 S
+4D M
+55 U
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+0 
+4 
+0 
+0 
+FF �
+FF �
+FF �
+FD �
+void smu::Comm::interpret(const void*, uint16_t):249:Opcode: 1
+Hardware version: 4.0.0
+Firmware version: 255.255.253
+Device ID     : 0 
+goodID        : 1 
+Remaining time: 0.884266853333 sec 
+
+libxsmu changeBaud 9600 5
+
+void smu::Driver::changeBaud(uint32_t*, float*):1244:virtuaSMU : AckBits Reset
+void smu::Comm::transmit_changeBaud(uint32_t):1393:Comm : QP4_Packet allocated
+void smu::Comm::transmit_changeBaud(uint32_t):1400:Comm : Packet Sealed and Transmitted
+void smu::Driver::changeBaud(uint32_t*, float*):1247:virtuaSMU : Transmitted baudRate, Starting wait for response
+51 Q
+50 P
+34 4
+31 1
+0 
+8 
+FF �
+30 0
+0 
+2B +
+0 
+0 
+0 
+0 
+25 %
+80 �
+void smu::Comm::interpret(const void*, uint16_t):249:Opcode: 43
+void smu::Comm::changeBaudCB(const void*, uint16_t):746:Comm : Packet Size Okay
+void smu::Comm::changeBaudCB(const void*, uint16_t):752:Comm : Callback Completed
+
+*Waits here*
+
+libxsmu timeout 9600 0
+Baud Rate:  9600 
+Timeout:  0.0
+Communication timeout in changeBaud
+```
