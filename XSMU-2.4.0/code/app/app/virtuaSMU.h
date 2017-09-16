@@ -58,7 +58,7 @@ class Driver {
 	/***************************************************/
 
 	void identify (float* timeout);
-	void sync (float* timeout);
+	void keepAlive (uint32_t* lease_time_ms, float* timeout);
 
 	void setSourceMode (SourceMode* mode, float* timeout);
 
@@ -165,9 +165,9 @@ class Driver {
 	void VM_getTerminal (VM_Terminal* terminal, float* timeout);
 
 	/***************************************************/
-	
+
 	void changeBaud (uint32_t* baudRate, float* timeout);
-	
+
 	/***************************************************/
  public:
 	bool goodID (void) const;
@@ -184,7 +184,7 @@ class Driver {
 
 	void nopCB (const CommCB* oCB);
 	void identityCB (const CommCB* oCB);
-	void syncCB (const CommCB* oCB);
+	void keepAliveCB (const CommCB* oCB);
 
 	void setSourceModeCB (const CommCB* oCB);
 
@@ -235,7 +235,7 @@ class Driver {
 
 	void VM_setTerminalCB (const CommCB* oCB);
 	void VM_getTerminalCB (const CommCB* oCB);
-	
+
 	void changeBaudCB (const CommCB* oCB);
 
  private:
@@ -250,7 +250,10 @@ class Driver {
 	VersionInfo* versionInfo_;
 	AckBits ackBits_;
 	std::string identity_;
+
+private:
 	uint32_t baudRate_;
+
 };
 
 /************************************************************************/

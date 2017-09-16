@@ -18,7 +18,7 @@ extern "C" {
  */
 int scan(void);
 
-/**************************************************************/
+/************************************************************************/
 
 /**
  * \brief Returns the serial number of a previously scanned device.
@@ -37,7 +37,7 @@ int scan(void);
  */
 const char *serialNo(int i);
 
-/**************************************************************/
+/************************************************************************/
 
 /**
  * \brief Opens a previously scanned device for communication,
@@ -62,7 +62,7 @@ int open_device(const char *serialNo,
 				float timeout,
 				unsigned int *ret_goodID, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 /**
  * \brief Closes a previously opened device.
@@ -71,14 +71,14 @@ int open_device(const char *serialNo,
  */
 void close_device(int deviceID);
 
-/**************************************************************/
+/************************************************************************/
 
 void setSourceMode(int deviceID,
 				   int mode,
 				   float timeout,
 				   unsigned int *ret_mode, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void CS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -106,7 +106,7 @@ void CS_setCurrent(int deviceID, float current, float timeout,
 void CS_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void VS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -134,7 +134,7 @@ void VS_setVoltage(int deviceID, float voltage, float timeout,
 void VS_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void CM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -158,7 +158,7 @@ void CM_getReading(int deviceID, unsigned int filterLength,
 void CM_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void VM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -182,13 +182,13 @@ void VM_getReading(int deviceID, unsigned int filterLength,
 void VM_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void RM_getReadingAutoscale (int deviceID, unsigned int filterLength,
 							 float timeout, float *ret_resistance,
 							 float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void SystemConfig_Save (int deviceID,
 						float timeout,
@@ -205,7 +205,7 @@ void SystemConfig_Set_hardwareVersion (int deviceID,
 					unsigned int hardwareVersion, float timeout,
 					unsigned int* ret_hardwareVersion, float* ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void library_version  (int deviceID, unsigned int* version);
 void hardware_version (int deviceID, unsigned int* version);
@@ -218,7 +218,7 @@ unsigned int major_version_no (unsigned int version);
 unsigned int minor_version_no (unsigned int version);
 unsigned int bugfix_version_no (unsigned int version);
 
-/**************************************************************/
+/************************************************************************/
 
 void VM2_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -248,10 +248,13 @@ void VM_setTerminal(int deviceID, int terminal, float timeout,
 void VM_getTerminal(int deviceID, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 				unsigned int *ret_baudRate, float *ret_timeout);
+
+void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout, unsigned int *ret_lease_time_ms, float *ret_timeout);
+
 
 #ifdef __cplusplus
 }				// extern "C"

@@ -1,4 +1,4 @@
-#ifndef __SMU_FTDI__
+	#ifndef __SMU_FTDI__
 #define __SMU_FTDI__
 
 #include <vector>
@@ -30,25 +30,34 @@ namespace smu {
 
 class FTDI
 {
-	public:
+public:
 	FTDI (void);
 
-	public:
+public:
 	static std::vector<FTDI_DeviceInfo> scan (void);
 
-	public:
+public:
 	void open (const char* serialNo);
 	void open (const char* serialNo, int baudrate);
 	uint32_t read (void* data, uint32_t size);
 	uint32_t write (const void* data, uint32_t size);
 	void close (void);
 
-	public:
+public:
 	bool good (void) const;
 
-	private:
+private:
 	ftdi_context* handle_;
 	static std::vector<FTDI_DeviceInfo> scan (int vid, int pid);
+
+public:
+	bool isBaudValid (uint32_t bd);
+	void setBaudRate (uint32_t bd);
+
+private:
+	void _setBaudrate (uint32_t baudrate);
+
+
 };
 } // end of namespace smu
 

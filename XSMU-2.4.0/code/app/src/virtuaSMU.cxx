@@ -84,7 +84,7 @@ void Driver::comm_cb (const CommCB* oCB)
 	static const cb_t cbs[] = {
 		&Driver::nopCB,
 		&Driver::identityCB,
-		&Driver::syncCB,
+		&Driver::keepAliveCB,
 		&Driver::setSourceModeCB,
 
 		&Driver::CS_setRangeCB,
@@ -142,15 +142,15 @@ void Driver::comm_cb (const CommCB* oCB)
 		 (this->*cbs[oCB->code()]) (oCB);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::nopCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_NOP);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::identityCB (const CommCB* oCB)
 {
@@ -164,14 +164,14 @@ void Driver::identityCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_IDN);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
-void Driver::syncCB (const CommCB* oCB)
+void Driver::keepAliveCB (const CommCB* oCB)
 {
-	ackBits_.set (COMM_CBCODE_SYNC);
+	ackBits_.set (COMM_CBCODE_KEEP_ALIVE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::setSourceModeCB (const CommCB* oCB)
 {
@@ -193,8 +193,8 @@ void Driver::setSourceModeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_SET_SOURCE_MODE);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setRangeCB (const CommCB* oCB)
 {
@@ -205,7 +205,7 @@ void Driver::CS_setRangeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CS_SET_RANGE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_getCalibrationCB (const CommCB* oCB)
 {
@@ -216,7 +216,7 @@ void Driver::CS_getCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CS_GET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_verifyCalibrationCB (const CommCB* oCB)
 {
@@ -227,7 +227,7 @@ void Driver::CS_verifyCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CS_VERIFY_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setCalibrationCB (const CommCB* oCB)
 {
@@ -238,14 +238,14 @@ void Driver::CS_setCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CS_SET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_saveCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_CS_SAVE_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setCurrentCB (const CommCB* oCB)
 {
@@ -256,8 +256,8 @@ void Driver::CS_setCurrentCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CS_SET_CURRENT);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setRangeCB (const CommCB* oCB)
 {
@@ -268,7 +268,7 @@ void Driver::VS_setRangeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VS_SET_RANGE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_getCalibrationCB (const CommCB* oCB)
 {
@@ -279,7 +279,7 @@ void Driver::VS_getCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VS_GET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_verifyCalibrationCB (const CommCB* oCB)
 {
@@ -290,7 +290,7 @@ void Driver::VS_verifyCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VS_VERIFY_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setCalibrationCB (const CommCB* oCB)
 {
@@ -301,14 +301,14 @@ void Driver::VS_setCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VS_SET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_saveCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_VS_SAVE_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setVoltageCB (const CommCB* oCB)
 {
@@ -320,8 +320,8 @@ void Driver::VS_setVoltageCB (const CommCB* oCB)
 
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CM_setRangeCB (const CommCB* oCB)
 {
@@ -332,7 +332,7 @@ void Driver::CM_setRangeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CM_SET_RANGE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_getCalibrationCB (const CommCB* oCB)
 {
@@ -343,7 +343,7 @@ void Driver::CM_getCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CM_GET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_setCalibrationCB (const CommCB* oCB)
 {
@@ -354,14 +354,14 @@ void Driver::CM_setCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CM_SET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_saveCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_CM_SAVE_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_readCB (const CommCB* oCB)
 {
@@ -372,8 +372,8 @@ void Driver::CM_readCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_CM_READ);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setRangeCB (const CommCB* oCB)
 {
@@ -384,7 +384,7 @@ void Driver::VM_setRangeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM_SET_RANGE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_getCalibrationCB (const CommCB* oCB)
 {
@@ -395,7 +395,7 @@ void Driver::VM_getCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM_GET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setCalibrationCB (const CommCB* oCB)
 {
@@ -406,14 +406,14 @@ void Driver::VM_setCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM_SET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_saveCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_VM_SAVE_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_readCB (const CommCB* oCB)
 {
@@ -424,37 +424,37 @@ void Driver::VM_readCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM_READ);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CS_loadDefaultCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_loadDefaultCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_loadDefaultCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_loadDefaultCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::RM_readAutoscaleCB (const CommCB* oCB)
 {
@@ -465,8 +465,8 @@ void Driver::RM_readAutoscaleCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_RM_READ_AUTOSCALE);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::SystemConfig_GetCB (const CommCB* oCB)
 {
@@ -496,8 +496,8 @@ void Driver::SystemConfig_LoadDefaultCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_setRangeCB (const CommCB* oCB)
 {
@@ -508,7 +508,7 @@ void Driver::VM2_setRangeCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM2_SET_RANGE);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_getCalibrationCB (const CommCB* oCB)
 {
@@ -519,7 +519,7 @@ void Driver::VM2_getCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM2_GET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_setCalibrationCB (const CommCB* oCB)
 {
@@ -530,14 +530,14 @@ void Driver::VM2_setCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM2_SET_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_saveCalibrationCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_VM2_SAVE_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_readCB (const CommCB* oCB)
 {
@@ -553,7 +553,7 @@ void Driver::VM2_loadDefaultCalibrationCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setTerminalCB (const CommCB* oCB)
 {
@@ -574,24 +574,23 @@ void Driver::VM_getTerminalCB (const CommCB* oCB)
 	ackBits_.set (COMM_CBCODE_VM_GET_TERMINAL);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::changeBaudCB (const CommCB* oCB)
 {
-	//PRINT_DEBUG ("virtuaSMU : Entering changeBaudCB");
-
 	const CommCB_changeBaud* o =
 	reinterpret_cast<const CommCB_changeBaud*> (oCB);
 
 	baudRate_ =  o->baudRate();
-	//PRINT_DEBUG ("virtuaSMU : Retrieved baudRate");
 
-	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
-	//PRINT_DEBUG ("virtuaSMU : AckBits Set");
+	if (comm_->isBaudValid (baudRate_))
+		ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
+
+	comm_->setBaudRate (baudRate_);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::open (const char* serialNo, float* timeout)
 {
@@ -680,8 +679,8 @@ bool Driver::waitForResponse (uint16_t checkBit, float* timeout)
 	return ackBits_[checkBit];
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 bool Driver::goodID (void) const
 {
@@ -698,17 +697,18 @@ void Driver::identify (float* timeout)
 	waitForResponse (COMM_CBCODE_IDN, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
-void Driver::sync (float* timeout)
+void Driver::keepAlive (uint32_t* lease_time_ms, float* timeout)
 {
-	ackBits_.reset (COMM_CBCODE_SYNC);
+	ackBits_.reset (COMM_CBCODE_KEEP_ALIVE);
 
-	comm_->transmitSync();
-	waitForResponse (COMM_CBCODE_SYNC, timeout);
+	comm_->transmit_keepAlive (*lease_time_ms);
+
+	waitForResponse (COMM_CBCODE_KEEP_ALIVE, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::setSourceMode (SourceMode* mode, float* timeout)
 {
@@ -724,8 +724,8 @@ void Driver::setSourceMode (SourceMode* mode, float* timeout)
 	}
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setRange (CS_Range* range, float* timeout)
 {
@@ -737,7 +737,7 @@ void Driver::CS_setRange (CS_Range* range, float* timeout)
 		*range = (cs_->range());
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_getCalibration (uint16_t* index, int16_t* dac,
 								  float* current, float* timeout)
@@ -752,7 +752,7 @@ void Driver::CS_getCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_verifyCalibration (uint16_t* index, int16_t* dac,
 									 float* current, float* timeout)
@@ -767,7 +767,7 @@ void Driver::CS_verifyCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setCalibration (uint16_t* index, int16_t* dac,
 								  float* current, float* timeout)
@@ -782,7 +782,7 @@ void Driver::CS_setCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_saveCalibration (float* timeout)
 {
@@ -791,7 +791,7 @@ void Driver::CS_saveCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_CS_SAVE_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CS_setCurrent (float* current, float* timeout)
 {
@@ -802,8 +802,8 @@ void Driver::CS_setCurrent (float* current, float* timeout)
 		*current = cs_->current();
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setRange (VS_Range* range, float* timeout)
 {
@@ -814,7 +814,7 @@ void Driver::VS_setRange (VS_Range* range, float* timeout)
 		*range = (vs_->range());
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_getCalibration (uint16_t* index, int16_t* dac,
 								  float* voltage, float* timeout)
@@ -829,7 +829,7 @@ void Driver::VS_getCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_verifyCalibration (uint16_t* index, int16_t* dac,
 									 float* voltage, float* timeout)
@@ -844,7 +844,7 @@ void Driver::VS_verifyCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setCalibration (uint16_t* index, int16_t* dac,
 								  float* voltage, float* timeout)
@@ -859,7 +859,7 @@ void Driver::VS_setCalibration (uint16_t* index, int16_t* dac,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_saveCalibration (float* timeout)
 {
@@ -868,7 +868,7 @@ void Driver::VS_saveCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VS_SAVE_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_setVoltage (float* voltage, float* timeout)
 {
@@ -879,8 +879,8 @@ void Driver::VS_setVoltage (float* voltage, float* timeout)
 		*voltage = vs_->voltage();
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CM_setRange (CM_Range* range, float* timeout)
 {
@@ -891,7 +891,7 @@ void Driver::CM_setRange (CM_Range* range, float* timeout)
 		*range = (cm_->range());
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_getCalibration (uint16_t* index, int32_t* adc,
 								  float* current, float* timeout)
@@ -906,7 +906,7 @@ void Driver::CM_getCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_setCalibration (uint16_t* index, int32_t* adc,
 								  float* current, float* timeout)
@@ -921,7 +921,7 @@ void Driver::CM_setCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_saveCalibration (float* timeout)
 {
@@ -930,7 +930,7 @@ void Driver::CM_saveCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_CM_SAVE_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_read (uint16_t* filterLength, float* current,
 						float* timeout)
@@ -943,8 +943,8 @@ void Driver::CM_read (uint16_t* filterLength, float* current,
 	}
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setRange (VM_Range* range, float* timeout)
 {
@@ -955,7 +955,7 @@ void Driver::VM_setRange (VM_Range* range, float* timeout)
 		*range = (vm_->range());
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_getCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
@@ -970,7 +970,7 @@ void Driver::VM_getCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
@@ -985,7 +985,7 @@ void Driver::VM_setCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_saveCalibration (float* timeout)
 {
@@ -994,7 +994,7 @@ void Driver::VM_saveCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VM_SAVE_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
@@ -1007,8 +1007,8 @@ void Driver::VM_read (uint16_t* filterLength, float* voltage,
 	}
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::CS_loadDefaultCalibration (float* timeout)
 {
@@ -1017,7 +1017,7 @@ void Driver::CS_loadDefaultCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VS_loadDefaultCalibration (float* timeout)
 {
@@ -1026,7 +1026,7 @@ void Driver::VS_loadDefaultCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::CM_loadDefaultCalibration (float* timeout)
 {
@@ -1035,7 +1035,7 @@ void Driver::CM_loadDefaultCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_loadDefaultCalibration (float* timeout)
 {
@@ -1044,8 +1044,8 @@ void Driver::VM_loadDefaultCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::RM_readAutoscale (uint16_t* filterLength,
 								  float* resistance,float* timeout)
@@ -1057,8 +1057,8 @@ void Driver::RM_readAutoscale (uint16_t* filterLength,
 	}
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::SystemConfig_Save (float* timeout)
 {
@@ -1145,8 +1145,8 @@ SystemConfig_Set_hardwareVersion (uint32_t* version, float* timeout)
 							    sysconf_->hwBugfixNo());
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_setRange (VM2_Range* range, float* timeout)
 {
@@ -1157,7 +1157,7 @@ void Driver::VM2_setRange (VM2_Range* range, float* timeout)
 		*range = (vm2_->range());
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_getCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
@@ -1172,7 +1172,7 @@ void Driver::VM2_getCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_setCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
@@ -1187,7 +1187,7 @@ void Driver::VM2_setCalibration (uint16_t* index, int32_t* adc,
 	}
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_saveCalibration (float* timeout)
 {
@@ -1196,7 +1196,7 @@ void Driver::VM2_saveCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VM2_SAVE_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
@@ -1208,7 +1208,7 @@ void Driver::VM2_read (uint16_t* filterLength, float* voltage,
 		*voltage = vm2_->voltage();
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM2_loadDefaultCalibration (float* timeout)
 {
@@ -1217,7 +1217,7 @@ void Driver::VM2_loadDefaultCalibration (float* timeout)
 	waitForResponse (COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION, timeout);
 }
 
-/***************************************************************************/
+/************************************************************************/
 
 void Driver::VM_setTerminal (VM_Terminal* terminal, float* timeout)
 {
@@ -1237,24 +1237,19 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 		*terminal = (vm_->terminal());
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
-	//PRINT_DEBUG ("virtuaSMU : AckBits Reset");
 
 	comm_->transmit_changeBaud (*baudRate);
-	//PRINT_DEBUG("virtuaSMU : Transmitted baudRate, Starting wait for response");
 
 	if (waitForResponse (COMM_CBCODE_CHANGE_BAUD, timeout))
-	{
-		//PRINT_DEBUG ("virtuaSMU : Recieved Response");
 		*baudRate = baudRate_;
-	}
 }
 
-/***************************************************************************/
-/***************************************************************************/
+/************************************************************************/
+/************************************************************************/
 }

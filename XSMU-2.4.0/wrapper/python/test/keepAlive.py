@@ -29,18 +29,18 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
-# Set Baud Rate of communication
+# Sends Keep_Alive Packet to device
 
-timeout = 5.0
-baudRate = 9600
+timeout       = 5.0
+lease_time_ms = 10000
 
-baudRate, timeout = libxsmu.changeBaud (deviceID, baudRate, timeout)
+lease_time_ms, timeout = libxsmu.keepAlive (deviceID, lease_time_ms, timeout)
 print \
-	"Baud Rate: ", baudRate, "\n" \
+	"Lease Time: ", lease_time_ms, "\n" \
 	"Timeout: ", timeout
 
 if (timeout == 0.0):
-	print 'Communication timeout in changeBaud'
+	print 'Communication timeout in keepAlive'
 	exit (-2)
 
 ##########################################################################
