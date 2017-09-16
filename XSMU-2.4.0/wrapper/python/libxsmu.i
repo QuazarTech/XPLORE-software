@@ -392,6 +392,8 @@ extern void VM_getTerminal(int deviceID, float timeout,
 extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 						  unsigned int *OUTPUT, float *OUTPUT);
 
+extern void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
+							unsigned int *OUTPUT, float *OUTPUT);
 
 /**************************************************************/
 /**************************************************************/

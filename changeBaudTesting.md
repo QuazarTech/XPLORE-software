@@ -621,3 +621,90 @@ Baud Rate:  9600
 Timeout:  4.9146270752
 
 ```
+
+### Testng for keepAlive (wrapper/python/test/keepAlive.py)
+
+- Result : Passed
+-Output :
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	51 Q
+	50 P
+	34 4
+	31 1
+	0 
+	2C ,
+	F9 �
+	12 
+	0 
+	1 
+	0 
+	0 
+	58 X
+	50 P
+	4C L
+	4F O
+	52 R
+	45 E
+	20  
+	53 S
+	4D M
+	55 U
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	0 
+	4 
+	0 
+	0 
+	FF �
+	FF �
+	FF �
+	FD �
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.849823951721 sec 
+
+	51 Q
+	50 P
+	34 4
+	31 1
+	0 
+	8 
+	FF �
+	C7 �
+	0 
+	2 
+	0 
+	0 
+	0 
+	0 
+	27 '
+	10 
+	Lease Time:  10000 
+	Timeout:  4.91435289383
+	```
