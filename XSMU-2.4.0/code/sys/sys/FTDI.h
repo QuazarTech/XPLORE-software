@@ -51,7 +51,6 @@ private:
 	static std::vector<FTDI_DeviceInfo> scan (int vid, int pid);
 
 public:
-	bool isBaudValid (uint32_t bd);
 	void setBaudRate (uint32_t bd);
 
 private:

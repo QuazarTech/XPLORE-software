@@ -2637,7 +2637,6 @@ private:
 	void transmit (const QP4_Packet* packet);
 
 public:
-	bool isBaudValid (uint32_t baudRate);
 	void setBaudRate (uint32_t baudRate);
 };
 

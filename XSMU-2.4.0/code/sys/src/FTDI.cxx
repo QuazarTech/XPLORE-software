@@ -239,34 +239,6 @@ bool FTDI::good (void) const
 	return handle_;
 }
 
-bool FTDI::isBaudValid (uint32_t bd)
-{
-	switch (bd)
-	{
-		case 9600:
-			return true;
-
-
-		case 19200:
-			return true;
-
-
-		case 38400:
-			return true;
-
-
-		case 57600:
-			return true;
-
-
-		case 115200:
-			return true;
-
-		default:
-			return false;
-	}
-}
-
 void FTDI::setBaudRate (uint32_t bd)
 {
 	switch (bd)

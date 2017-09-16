@@ -145,11 +145,6 @@ void Comm::transmit (const QP4_Packet* packet)
 
 /************************************************************************/
 
-bool Comm::isBaudValid (uint32_t baudRate)
-{
-	return ftdi_->isBaudValid (baudRate);
-}
-
 void Comm::setBaudRate (uint32_t baudRate)
 {
 	ftdi_->setBaudRate (baudRate);

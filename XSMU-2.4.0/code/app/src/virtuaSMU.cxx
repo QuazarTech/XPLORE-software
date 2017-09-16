@@ -583,10 +583,8 @@ void Driver::changeBaudCB (const CommCB* oCB)
 
 	baudRate_ =  o->baudRate();
 
-	if (comm_->isBaudValid (baudRate_))
-		ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
-
 	comm_->setBaudRate (baudRate_);
+	ackBits_.set (COMM_CBCODE_CHANGE_BAUD);
 }
 
 /************************************************************************/
