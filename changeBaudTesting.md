@@ -708,3 +708,257 @@ Timeout:  4.9146270752
 	Lease Time:  10000 
 	Timeout:  4.91435289383
 	```
+	
+	
+---
+	
+### Testing for async thread calling keepAlive() and locking mechanism in Comm
+Added :
+- PRINT_DEBUG ("Asynch thread launched") in open()
+- PRINT_DEBUG ("Inside thread : Keep Alive sent") inside thread()
+- PRINT_DEBUG ("Lock Acquired") in keepAlive, changeBaud, VS_setVoltage and VM_Read functions
+- Output for `python keepAlive.py`
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):622:Asynch thread launched
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.869105100632 sec 
+
+	void smu::Driver::keepAlive(uint32_t*, float*):719:Lock Acquired
+	Lease Time:  10000 
+	Timeout:  4.89869022369
+	void smu::Driver::keepAlive(uint32_t*, float*):719:Lock Acquired
+	void smu::Driver::thread():735:Inside thread : Keep Alive sent
+	```
+
+- Output for `python changeBaud.py`
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):622:Asynch thread launched
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.869477987289 sec 
+
+	void smu::Driver::changeBaud(uint32_t*, float*):1373:Lock Acquired
+	Baud Rate:  9600 
+	Timeout:  4.9146399498
+	void smu::Driver::keepAlive(uint32_t*, float*):719:Lock Acquired
+	void smu::Driver::thread():735:Inside thread : Keep Alive sent
+	```
+- Output for `python VS_setVoltage.py 1`
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):622:Asynch thread launched
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.850958108902 sec 
+
+	void smu::Driver::VS_setVoltage(float*, float*):944:Lock Acquired
+	Voltage:  0.999929249287 
+	Timeout:  4.91469097137
+	void smu::Driver::keepAlive(uint32_t*, float*):719:Lock Acquired
+	void smu::Driver::thread():735:Inside thread : Keep Alive sent
+	```
+- Output for `python VM_Read.py` (Ended with `Ctrl+c`)
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):622:Asynch thread launched
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: 0.870882987976 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.13914418221 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15525889397 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17055797577 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.1550321579 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17103505135 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20280408859 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15487217903 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17105913162 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20312213898 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20294713974 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15506291389 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.1709561348 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20299291611 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15482211113 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17106795311 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20310091972 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20291304588 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15489888191 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17089796066 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20286202431 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15500307083 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17052602768 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20300483704 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20285892487 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15503001213 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17059803009 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20324611664 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15489792824 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17091703415 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20329713821 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20329809189 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15476918221 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17097902298 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20291399956 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15500283241 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17109894753 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20278191566 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20280718803 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15464901924 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.17091703415 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.20296692848 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	voltage               : -0.101999998093 
+	Remaining time        : 1.15501594543 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1093:Lock Acquired
+	^CTraceback (most recent call last):
+	File "VM_getReading.py", line 40, in <module>
+		voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
+	KeyboardInterrupt
+	```

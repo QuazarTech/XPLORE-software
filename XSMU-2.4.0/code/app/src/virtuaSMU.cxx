@@ -619,6 +619,7 @@ void Driver::open (const char* serialNo, float* timeout)
 		 << std::endl;
 
 	_thread_future = std::async (&Driver::thread, this);
+	PRINT_DEBUG ("Asynch thread launched")
 }
 
 void Driver::close (void)
@@ -715,6 +716,7 @@ void Driver::identify (float* timeout)
 void Driver::keepAlive (uint32_t* lease_time_ms, float* timeout)
 {
 	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_KEEP_ALIVE);
 	comm_->transmit_keepAlive (*lease_time_ms);
@@ -730,6 +732,7 @@ void Driver::thread (void)
 	float timeout = 1;
 
 	keepAlive (&lease_time_ms, &timeout);
+	PRINT_DEBUG ("Inside thread : Keep Alive sent")
 	double last_sent_at = timer.get();
 	double elapsed = 0;
 
@@ -740,6 +743,7 @@ void Driver::thread (void)
 		{
 			timeout = 1;
 			keepAlive (&lease_time_ms, &timeout);
+			PRINT_DEBUG ("Inside thread : Keep Alive sent")
 			last_sent_at = timer.get();
 		}
 
@@ -937,6 +941,7 @@ void Driver::VS_saveCalibration (float* timeout)
 void Driver::VS_setVoltage (float* voltage, float* timeout)
 {
 	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_VS_SET_VOLTAGE);
 	comm_->transmit_VS_setVoltage (*voltage);
@@ -1084,6 +1089,8 @@ void Driver::VM_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
 {
 	auto unique_lock = comm_->lock();
+	
+	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_VM_READ);
 	comm_->transmit_VM_read (*filterLength);
@@ -1363,6 +1370,7 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
 	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
 
