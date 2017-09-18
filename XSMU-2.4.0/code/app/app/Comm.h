@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string>
 #include <cstddef>
+#include <mutex>
 
 namespace smu{
 
@@ -2638,6 +2639,15 @@ private:
 
 public:
 	void setBaudRate (uint32_t baudRate);
+
+public:
+	std::unique_lock<std::mutex> lock (void)
+	{
+		return std::unique_lock<std::mutex> (_lock);
+	}
+
+private:
+	std::mutex _lock;
 };
 
 /************************************************************************/

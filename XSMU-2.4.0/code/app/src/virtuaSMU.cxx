@@ -1,5 +1,6 @@
 #include "../app/virtuaSMU.h"
 #include "../../sys/sys/Timer.h"
+#include "../../app/app/Exception.h"
 
 #include <cstdio>
 #include <string>
@@ -60,6 +61,8 @@ Driver::Driver (void)
 
 Driver::~Driver (void)
 {
+	close();
+
 	delete comm_;
 	delete vm_;
 	delete cm_;
@@ -614,10 +617,19 @@ void Driver::open (const char* serialNo, float* timeout)
 		 << MINOR_VERSION_NO (versionInfo_->firmware_version()) << '.'
 		 << BUGFIX_VERSION_NO (versionInfo_->firmware_version())
 		 << std::endl;
+
+	_thread_future = std::async (&Driver::thread, this);
 }
 
 void Driver::close (void)
 {
+	try {
+		_alive = false;
+		_thread_future.get();
+	}
+	catch (...)
+	{}
+
 	comm_->close();
 }
 
@@ -670,6 +682,8 @@ bool Driver::waitForResponse (uint16_t checkBit, float* timeout)
 		if (elapsed > 100e-3)
 			timer.sleep (10e-3);
 
+		if (ackBits_[COMM_CBCODE_NOP])
+			throw NoOperation();
 	}
 	while (!ackBits_[checkBit]);
 
@@ -689,9 +703,10 @@ void Driver::identify (float* timeout)
 {
 	identity_.clear();
 	versionInfo_->clear();
-	ackBits_.reset (COMM_CBCODE_IDN);
 
+	ackBits_.reset (COMM_CBCODE_IDN);
 	comm_->transmitIdentify();
+
 	waitForResponse (COMM_CBCODE_IDN, timeout);
 }
 
@@ -699,17 +714,49 @@ void Driver::identify (float* timeout)
 
 void Driver::keepAlive (uint32_t* lease_time_ms, float* timeout)
 {
-	ackBits_.reset (COMM_CBCODE_KEEP_ALIVE);
+	auto unique_lock = comm_->lock();
 
+	ackBits_.reset (COMM_CBCODE_KEEP_ALIVE);
 	comm_->transmit_keepAlive (*lease_time_ms);
 
 	waitForResponse (COMM_CBCODE_KEEP_ALIVE, timeout);
+}
+
+void Driver::thread (void)
+{
+	Timer timer;
+
+	uint32_t lease_time_ms = 10000;
+	float timeout = 1;
+
+	keepAlive (&lease_time_ms, &timeout);
+	double last_sent_at = timer.get();
+	double elapsed = 0;
+
+	while (_alive)
+	{
+		elapsed = timer.get() - last_sent_at;
+		if (elapsed > lease_time_ms/3)
+		{
+			timeout = 1;
+			keepAlive (&lease_time_ms, &timeout);
+			last_sent_at = timer.get();
+		}
+
+		/********************************************************
+		* Prevents 100% CPU utilization,
+		* in case the operation is taking longer than 100ms.
+		* *******************************************************/
+		timer.sleep (10e-3);
+	}
 }
 
 /************************************************************************/
 
 void Driver::setSourceMode (SourceMode* mode, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_SET_SOURCE_MODE);
 	comm_->transmitSourceMode (toComm_SourceMode ((uint16_t)*mode));
 	if (waitForResponse (COMM_CBCODE_SET_SOURCE_MODE, timeout)) {
@@ -727,8 +774,9 @@ void Driver::setSourceMode (SourceMode* mode, float* timeout)
 
 void Driver::CS_setRange (CS_Range* range, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_SET_RANGE);
-	comm_->transmit_CS_setRange (toComm_CS_Range (*range));
 	comm_->transmit_CS_setRange (toComm_CS_Range (*range));
 
 	if (waitForResponse (COMM_CBCODE_CS_SET_RANGE, timeout))
@@ -755,6 +803,8 @@ void Driver::CS_getCalibration (uint16_t* index, int16_t* dac,
 void Driver::CS_verifyCalibration (uint16_t* index, int16_t* dac,
 									 float* current, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_VERIFY_CALIBRATION);
 	comm_->transmit_CS_verifyCalibration (*index);
 
@@ -770,6 +820,8 @@ void Driver::CS_verifyCalibration (uint16_t* index, int16_t* dac,
 void Driver::CS_setCalibration (uint16_t* index, int16_t* dac,
 								  float* current, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_SET_CALIBRATION);
 	comm_->transmit_CS_setCalibration (*index,* current);
 
@@ -784,6 +836,8 @@ void Driver::CS_setCalibration (uint16_t* index, int16_t* dac,
 
 void Driver::CS_saveCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_SAVE_CALIBRATION);
 	comm_->transmit_CS_saveCalibration();
 	waitForResponse (COMM_CBCODE_CS_SAVE_CALIBRATION, timeout);
@@ -793,6 +847,8 @@ void Driver::CS_saveCalibration (float* timeout)
 
 void Driver::CS_setCurrent (float* current, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_SET_CURRENT);
 	comm_->transmit_CS_setCurrent (*current);
 
@@ -805,6 +861,8 @@ void Driver::CS_setCurrent (float* current, float* timeout)
 
 void Driver::VS_setRange (VS_Range* range, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_SET_RANGE);
 	comm_->transmit_VS_setRange (toComm_VS_Range (*range));
 
@@ -817,6 +875,8 @@ void Driver::VS_setRange (VS_Range* range, float* timeout)
 void Driver::VS_getCalibration (uint16_t* index, int16_t* dac,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_GET_CALIBRATION);
 	comm_->transmit_VS_getCalibration (*index);
 
@@ -832,6 +892,8 @@ void Driver::VS_getCalibration (uint16_t* index, int16_t* dac,
 void Driver::VS_verifyCalibration (uint16_t* index, int16_t* dac,
 									 float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_VERIFY_CALIBRATION);
 	comm_->transmit_VS_verifyCalibration (*index);
 
@@ -847,6 +909,8 @@ void Driver::VS_verifyCalibration (uint16_t* index, int16_t* dac,
 void Driver::VS_setCalibration (uint16_t* index, int16_t* dac,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_SET_CALIBRATION);
 	comm_->transmit_VS_setCalibration (*index,* voltage);
 
@@ -861,6 +925,8 @@ void Driver::VS_setCalibration (uint16_t* index, int16_t* dac,
 
 void Driver::VS_saveCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_SAVE_CALIBRATION);
 	comm_->transmit_VS_saveCalibration();
 	waitForResponse (COMM_CBCODE_VS_SAVE_CALIBRATION, timeout);
@@ -870,6 +936,8 @@ void Driver::VS_saveCalibration (float* timeout)
 
 void Driver::VS_setVoltage (float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_SET_VOLTAGE);
 	comm_->transmit_VS_setVoltage (*voltage);
 
@@ -882,6 +950,8 @@ void Driver::VS_setVoltage (float* voltage, float* timeout)
 
 void Driver::CM_setRange (CM_Range* range, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_SET_RANGE);
 	comm_->transmit_CM_setRange (toComm_CM_Range (*range));
 
@@ -894,6 +964,8 @@ void Driver::CM_setRange (CM_Range* range, float* timeout)
 void Driver::CM_getCalibration (uint16_t* index, int32_t* adc,
 								  float* current, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_GET_CALIBRATION);
 	comm_->transmit_CM_getCalibration (*index);
 
@@ -909,6 +981,8 @@ void Driver::CM_getCalibration (uint16_t* index, int32_t* adc,
 void Driver::CM_setCalibration (uint16_t* index, int32_t* adc,
 								  float* current, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_SET_CALIBRATION);
 	comm_->transmit_CM_setCalibration (*index,* current);
 
@@ -923,6 +997,8 @@ void Driver::CM_setCalibration (uint16_t* index, int32_t* adc,
 
 void Driver::CM_saveCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_SAVE_CALIBRATION);
 	comm_->transmit_CM_saveCalibration();
 	waitForResponse (COMM_CBCODE_CM_SAVE_CALIBRATION, timeout);
@@ -933,6 +1009,8 @@ void Driver::CM_saveCalibration (float* timeout)
 void Driver::CM_read (uint16_t* filterLength, float* current,
 						float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_READ);
 	comm_->transmit_CM_read (*filterLength);
 	if (waitForResponse (COMM_CBCODE_CM_READ, timeout)) {
@@ -946,6 +1024,8 @@ void Driver::CM_read (uint16_t* filterLength, float* current,
 
 void Driver::VM_setRange (VM_Range* range, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_SET_RANGE);
 	comm_->transmit_VM_setRange (toComm_VM_Range (*range));
 
@@ -958,6 +1038,8 @@ void Driver::VM_setRange (VM_Range* range, float* timeout)
 void Driver::VM_getCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_GET_CALIBRATION);
 	comm_->transmit_VM_getCalibration (*index);
 
@@ -973,6 +1055,8 @@ void Driver::VM_getCalibration (uint16_t* index, int32_t* adc,
 void Driver::VM_setCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_SET_CALIBRATION);
 	comm_->transmit_VM_setCalibration (*index,* voltage);
 
@@ -987,6 +1071,8 @@ void Driver::VM_setCalibration (uint16_t* index, int32_t* adc,
 
 void Driver::VM_saveCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_SAVE_CALIBRATION);
 	comm_->transmit_VM_saveCalibration();
 	waitForResponse (COMM_CBCODE_VM_SAVE_CALIBRATION, timeout);
@@ -997,6 +1083,8 @@ void Driver::VM_saveCalibration (float* timeout)
 void Driver::VM_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_READ);
 	comm_->transmit_VM_read (*filterLength);
 	if (waitForResponse (COMM_CBCODE_VM_READ, timeout)) {
@@ -1010,6 +1098,8 @@ void Driver::VM_read (uint16_t* filterLength, float* voltage,
 
 void Driver::CS_loadDefaultCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION);
 	comm_->transmit_CS_loadDefaultCalibration();
 	waitForResponse (COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION, timeout);
@@ -1019,6 +1109,8 @@ void Driver::CS_loadDefaultCalibration (float* timeout)
 
 void Driver::VS_loadDefaultCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION);
 	comm_->transmit_VS_loadDefaultCalibration();
 	waitForResponse (COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION, timeout);
@@ -1028,6 +1120,8 @@ void Driver::VS_loadDefaultCalibration (float* timeout)
 
 void Driver::CM_loadDefaultCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION);
 	comm_->transmit_CM_loadDefaultCalibration();
 	waitForResponse (COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION, timeout);
@@ -1037,6 +1131,8 @@ void Driver::CM_loadDefaultCalibration (float* timeout)
 
 void Driver::VM_loadDefaultCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION);
 	comm_->transmit_VM_loadDefaultCalibration();
 	waitForResponse (COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION, timeout);
@@ -1048,6 +1144,8 @@ void Driver::VM_loadDefaultCalibration (float* timeout)
 void Driver::RM_readAutoscale (uint16_t* filterLength,
 								  float* resistance,float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_RM_READ_AUTOSCALE);
 	comm_->transmit_RM_readAutoscale (*filterLength);
 	if (waitForResponse (COMM_CBCODE_RM_READ_AUTOSCALE, timeout)) {
@@ -1060,6 +1158,8 @@ void Driver::RM_readAutoscale (uint16_t* filterLength,
 
 void Driver::SystemConfig_Save (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_SYSTEM_CONFIG_SAVE);
 	comm_->transmit_SystemConfig_Save();
 	waitForResponse (COMM_CBCODE_SYSTEM_CONFIG_SAVE, timeout);
@@ -1067,6 +1167,8 @@ void Driver::SystemConfig_Save (float* timeout)
 
 void Driver::SystemConfig_LoadDefault (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT);
 	comm_->transmit_SystemConfig_LoadDefault();
 	waitForResponse (COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT, timeout);
@@ -1075,6 +1177,8 @@ void Driver::SystemConfig_LoadDefault (float* timeout)
 void Driver::
 SystemConfig_Get_hardwareVersion (uint32_t* version, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	/**** Getting PCB information ****/
 	ackBits_.reset (COMM_CBCODE_SYSTEM_CONFIG_GET);
 	comm_->transmit_SystemConfig_Get (
@@ -1109,6 +1213,8 @@ SystemConfig_Get_hardwareVersion (uint32_t* version, float* timeout)
 void Driver::
 SystemConfig_Set_hardwareVersion (uint32_t* version, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	/**** Setting PCB information ****/
 	ackBits_.reset (COMM_CBCODE_SYSTEM_CONFIG_SET);
 	comm_->transmit_SystemConfig_Set (
@@ -1148,6 +1254,8 @@ SystemConfig_Set_hardwareVersion (uint32_t* version, float* timeout)
 
 void Driver::VM2_setRange (VM2_Range* range, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_SET_RANGE);
 	comm_->transmit_VM2_setRange (toComm_VM2_Range (*range));
 
@@ -1160,6 +1268,8 @@ void Driver::VM2_setRange (VM2_Range* range, float* timeout)
 void Driver::VM2_getCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_GET_CALIBRATION);
 	comm_->transmit_VM2_getCalibration (*index);
 
@@ -1175,6 +1285,8 @@ void Driver::VM2_getCalibration (uint16_t* index, int32_t* adc,
 void Driver::VM2_setCalibration (uint16_t* index, int32_t* adc,
 								  float* voltage, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_SET_CALIBRATION);
 	comm_->transmit_VM2_setCalibration (*index,* voltage);
 
@@ -1189,6 +1301,8 @@ void Driver::VM2_setCalibration (uint16_t* index, int32_t* adc,
 
 void Driver::VM2_saveCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_SAVE_CALIBRATION);
 	comm_->transmit_VM2_saveCalibration();
 	waitForResponse (COMM_CBCODE_VM2_SAVE_CALIBRATION, timeout);
@@ -1199,6 +1313,8 @@ void Driver::VM2_saveCalibration (float* timeout)
 void Driver::VM2_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_READ);
 	comm_->transmit_VM2_read (*filterLength);
 
@@ -1210,6 +1326,8 @@ void Driver::VM2_read (uint16_t* filterLength, float* voltage,
 
 void Driver::VM2_loadDefaultCalibration (float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION);
 	comm_->transmit_VM2_loadDefaultCalibration();
 	waitForResponse (COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION, timeout);
@@ -1219,6 +1337,8 @@ void Driver::VM2_loadDefaultCalibration (float* timeout)
 
 void Driver::VM_setTerminal (VM_Terminal* terminal, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_SET_TERMINAL);
 	comm_->transmit_VM_setTerminal (toComm_VM_Terminal (*terminal));
 
@@ -1228,6 +1348,8 @@ void Driver::VM_setTerminal (VM_Terminal* terminal, float* timeout)
 
 void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_VM_GET_TERMINAL);
 	comm_->transmit_VM_getTerminal ();
 
@@ -1240,6 +1362,8 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 {
+	auto unique_lock = comm_->lock();
+
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
 
 	comm_->transmit_changeBaud (*baudRate);
