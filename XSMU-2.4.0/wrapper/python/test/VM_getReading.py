@@ -34,7 +34,7 @@ if (timeout == 0.0) or (not goodID):
 
 logfile = open ('log.txt', 'w')
 
-for n in range (0, 200):
+for n in range (0, 100):
 	filter_length = 32
 	timeout = 1 + 0.03 * filter_length
 	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
@@ -44,10 +44,10 @@ for n in range (0, 200):
 
 	logfile.write (str (voltage) + '\n')
 	logfile.flush()
-	# sleep (1)
+	#sleep (1)
 
 if (timeout == 0.0):
-	print 'Communication timeout in CM_getReading.'
+	print 'Communication timeout in VM_getReading.'
 	exit (-2)
 
 ##########################################################################

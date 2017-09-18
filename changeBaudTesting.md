@@ -962,3 +962,142 @@ Added :
 		voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
 	KeyboardInterrupt
 	```
+The output of this last test is not as expected. Since the keepAlive function is being called in a parallel thread, it should the Lock Acquired for keeAlive should show up in between the Lock Acquired for VM_read.
+
+
+But if the range is changed from (0, 200) to (0, 1) in `VM_getReading.py`, the output is :
+
+```
+libxsmu version: 2.1.2
+Total device: 1
+Seial number: XSMU012A
+libxsmu version: 2.1.2
+Hardware version: 4.0.0
+Firmware version: 255.255.253
+void smu::Driver::open(const char*, float*):622:Async thread launched
+Device ID     : 0 
+goodID        : 1 
+Remaining time: 0.832612991333 sec 
+
+void smu::Driver::VM_read(uint16_t*, float*, float*):1094:Lock Acquired
+voltage               : -2.67028808594e-05 
+Remaining time        : 1.18702793121 sec 
+
+void smu::Driver::keepAlive(uint32_t*, float*):718:Trying to Acquire Lock
+void smu::Driver::keepAlive(uint32_t*, float*):720:Lock Acquired
+void smu::Driver::thread():736:Inside thread : Keep Alive sent
+```
+- Added std::launch::async as argument to std::async to always set asynchronous operation of thread.
+- Fixed bug in `Driver::thread()` to convert ms into seconds for comparison inside while look
+- Output : 
+
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	void smu::Driver::open(const char*, float*):598:Opening Device
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):624:Async thread launched
+	Device ID     : 0 
+	goodID        : 1 
+	Remaining time: void smu::Driver::keepAlive(uint32_t*, float*)0.88267493248 sec :
+
+	721:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):723:Lock Acquired
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::thread():void smu::Driver::VM_read(uint16_t*, float*, float*):739:1098:Lock Acquired
+	Inside thread : Keep Alive sent
+	void smu::Driver::thread():743:Inside thread : Alive 139
+	voltage               : -2.47955322266e-05 
+	Remaining time        : 1.17120504379 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.86102294922e-05 
+	Remaining time        : 1.17108106613 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.86102294922e-05 
+	Remaining time        : 1.15503096581 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	void smu::Driver::keepAlive(uint32_t*, float*):721:Trying to Acquire Lock
+	voltage               : -2.67028808594e-05 
+	Remaining time        : void smu::Driver::keepAlive(uint32_t*, float*)1.17121624947 sec 
+
+	:723:Lock Acquired
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::thread():751:Inside thread : Keep Alive sent
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.16077613831 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.95639038086e-05 
+	Remaining time        : 1.17108201981 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.1545920372 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	void smu::Driver::keepAlive(uint32_t*, float*):721:Trying to Acquire Lock
+	voltage               : void smu::Driver::keepAlive(uint32_t*, float*):-2.86102294922e-05723 
+	Remaining time        ::Lock Acquired
+	1.17104387283 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::thread():751:Inside thread : Keep Alive sentvoid smu::Driver::VM_read(uint16_t*, float*, float*):1098:
+	Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.16069293022 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.67028808594e-05 
+	Remaining time        : 1.17099499702 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.67028808594e-05 
+	Remaining time        : 1.15505194664 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	void smu::Driver::keepAlive(uint32_t*, float*):721:Trying to Acquire Lock
+	voltage               : -2.47955322266e-05 
+	Remaining time        : 1.1710100174 secvoid smu::Driver::keepAlive(uint32_t*, float*) 
+
+	:723:Lock Acquired
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::thread():751:Inside thread : Keep Alive sent
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.16075015068 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.1713449955 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	voltage               : -2.5749206543e-05 
+	Remaining time        : 1.15498399734 sec 
+
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1096:Trying to Acquire Lock
+	void smu::Driver::VM_read(uint16_t*, float*, float*):1098:Lock Acquired
+	^Cvoid smu::Driver::keepAlive(uint32_t*, float*):721:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):723:Lock Acquired
+	Traceback (most recent call last):
+	File "VM_getReading.py", line 40, in <module>
+		voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
+	KeyboardInterrupt
+	```

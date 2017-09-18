@@ -595,6 +595,8 @@ void Driver::changeBaudCB (const CommCB* oCB)
 
 void Driver::open (const char* serialNo, float* timeout)
 {
+	PRINT_DEBUG ("Opening Device")
+	
 	std::cout << "libxsmu version: "
 		 << MAJOR_VERSION_NO (versionInfo_->libxsmu_version()) << "."
 		 << MINOR_VERSION_NO (versionInfo_->libxsmu_version()) << "."
@@ -618,13 +620,14 @@ void Driver::open (const char* serialNo, float* timeout)
 		 << BUGFIX_VERSION_NO (versionInfo_->firmware_version())
 		 << std::endl;
 
-	_thread_future = std::async (&Driver::thread, this);
-	PRINT_DEBUG ("Asynch thread launched")
+	_thread_future = std::async (std::launch::async, &Driver::thread, this);
+	PRINT_DEBUG ("Async thread launched")
 }
 
 void Driver::close (void)
 {
 	try {
+		PRINT_DEBUG ("Closing Device")
 		_alive = false;
 		_thread_future.get();
 	}
@@ -715,6 +718,7 @@ void Driver::identify (float* timeout)
 
 void Driver::keepAlive (uint32_t* lease_time_ms, float* timeout)
 {
+	PRINT_DEBUG ("Trying to Acquire Lock")
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
@@ -735,11 +739,12 @@ void Driver::thread (void)
 	PRINT_DEBUG ("Inside thread : Keep Alive sent")
 	double last_sent_at = timer.get();
 	double elapsed = 0;
-
+	
+	PRINT_DEBUG ("Inside thread : Alive " << _alive)
 	while (_alive)
 	{
 		elapsed = timer.get() - last_sent_at;
-		if (elapsed > lease_time_ms/3)
+		if (elapsed > lease_time_ms/3000)
 		{
 			timeout = 1;
 			keepAlive (&lease_time_ms, &timeout);
@@ -1088,8 +1093,8 @@ void Driver::VM_saveCalibration (float* timeout)
 void Driver::VM_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
 {
+	PRINT_DEBUG ("Trying to Acquire Lock")
 	auto unique_lock = comm_->lock();
-	
 	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_VM_READ);

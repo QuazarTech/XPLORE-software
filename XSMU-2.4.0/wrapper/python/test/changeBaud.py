@@ -1,4 +1,5 @@
 import libxsmu, time, math, sys
+from time import sleep
 
 ##########################################################################
 # Scans USB bus for Xplore SMU.
@@ -27,6 +28,8 @@ print \
 if (timeout == 0.0) or (not goodID):
 	print 'Communication timeout in open_device.'
 	exit (-2)
+
+sleep (5)
 
 ##########################################################################
 # Set Baud Rate of communication
