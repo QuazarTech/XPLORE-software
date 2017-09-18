@@ -170,6 +170,8 @@ class Driver {
 	/***************************************************/
 
 	void changeBaud (uint32_t* baudRate, float* timeout);
+	void recSize (uint32_t* recSize, float* timeout);
+	void recData (int32_t* recData, float* timeout);
 
 	/***************************************************/
  public:
@@ -240,6 +242,8 @@ class Driver {
 	void VM_getTerminalCB (const CommCB* oCB);
 
 	void changeBaudCB (const CommCB* oCB);
+	void recSizeCB (const CommCB* oCB);
+	void recDataCB (const CommCB* oCB);
 
  private:
 	Comm* comm_;

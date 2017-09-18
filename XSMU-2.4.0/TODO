@@ -1,0 +1,47 @@
+2.4.0 (Streamer)
+================
+
+	Nature       : Feature
+	Requested by : Quazar Research
+
+	Status       : Pending
+	Created on   : 2017-09-09 by KC
+	Closed on    : ---
+
+Description
+-----------
+
+The SMU is to stream voltmeter data at a specified frequency. This requires following features to be implemented.
+
+	1) Dynamically change baudrate to suit data stream.
+
+		-- CHANGE_BAUD
+
+	2) Start recording
+
+		-- START_REC : Starts recording of timed data into internal buffer.
+
+	3) Transfer recorded data chunks to computer
+
+		-- Two queues active and standby in firmware.
+
+		-- REC_SIZE : Queries number of available data points in buffer
+						
+			-- Data from ADC keeps getting stored into the Active queue (interrupt driven)
+			-- Software asks for REC_SIZE, firmware returns size of Standby queue
+
+		-- REC_DATA : Transfers requested number of data points to driver
+			
+			-- Firmware transfers data from Standby queue to software (may be in multiple packets; \
+					depends on size of stored data and size of comm packet)
+			-- This transfer is uint32_t (ADC value) and not float. Conversion to float is to be done in software now.
+			-- This requires the functions XX_setCalibration() to also save the calibration table in software.
+			-- When no data remaining data in Standby queue (switch Active and Standby queues)
+
+	5) Stop recording
+
+		-- STOP_REC : Stops recording gracefully.
+	
+	6)
+
+		-- KEEP_ALIVE : Stops recording if keep alive packets are not received, i.e. if driver is dead.

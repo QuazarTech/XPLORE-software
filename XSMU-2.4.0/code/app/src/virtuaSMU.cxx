@@ -139,6 +139,8 @@ void Driver::comm_cb (const CommCB* oCB)
 		&Driver::VM_getTerminalCB,
 
 		&Driver::changeBaudCB,
+		&Driver::recSizeCB,
+		&Driver::recDataCB,
 	};
 
 	if (oCB->code() < sizeof (cbs) / sizeof (cbs[0]))
@@ -591,12 +593,37 @@ void Driver::changeBaudCB (const CommCB* oCB)
 }
 
 /************************************************************************/
+
+void Driver::recSizeCB (const CommCB* oCB)
+{
+	const CommCB_recSize* o =
+	reinterpret_cast<const CommCB_recSize*> (oCB);
+
+	recSize_ =  o->recSize();
+
+	comm_->setBaudRate (recSize_);
+	ackBits_.set (COMM_CBCODE_REC_SIZE);
+}
+
+/************************************************************************/
+
+void Driver::recDataCB (const CommCB* oCB)
+{
+	const CommCB_recData* o =
+	reinterpret_cast<const CommCB_recData*> (oCB);
+
+	recData_ =  o->recData();
+
+	comm_->setBaudRate (recData_);
+	ackBits_.set (COMM_CBCODE_REC_DATA);
+}
+/************************************************************************/
 /************************************************************************/
 
 void Driver::open (const char* serialNo, float* timeout)
 {
 	PRINT_DEBUG ("Opening Device")
-	
+
 	std::cout << "libxsmu version: "
 		 << MAJOR_VERSION_NO (versionInfo_->libxsmu_version()) << "."
 		 << MINOR_VERSION_NO (versionInfo_->libxsmu_version()) << "."
@@ -736,11 +763,9 @@ void Driver::thread (void)
 	float timeout = 1;
 
 	keepAlive (&lease_time_ms, &timeout);
-	PRINT_DEBUG ("Inside thread : Keep Alive sent")
 	double last_sent_at = timer.get();
 	double elapsed = 0;
-	
-	PRINT_DEBUG ("Inside thread : Alive " << _alive)
+
 	while (_alive)
 	{
 		elapsed = timer.get() - last_sent_at;
@@ -748,7 +773,6 @@ void Driver::thread (void)
 		{
 			timeout = 1;
 			keepAlive (&lease_time_ms, &timeout);
-			PRINT_DEBUG ("Inside thread : Keep Alive sent")
 			last_sent_at = timer.get();
 		}
 
@@ -1385,6 +1409,35 @@ void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 		*baudRate = baudRate_;
 }
 
+/************************************************************************/
+
+void Driver::recSize (uint32_t* recSize, float* timeout)
+{
+	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
+
+	ackBits_.reset (COMM_CBCODE_REC_SIZE);
+
+	comm_->transmit_recSize (*recSize);
+
+	if (waitForResponse (COMM_CBCODE_REC_SIZE, timeout))
+		*recSize = recSize_;
+}
+
+/************************************************************************/
+
+void Driver::recData (int32_t* recData, float* timeout)
+{
+	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
+
+	ackBits_.reset (COMM_CBCODE_REC_DATA);
+
+	comm_->transmit_recData (**recData);
+
+	if (waitForResponse (COMM_CBCODE_REC_DATA, timeout))
+		*recData = recData_;
+}
 /************************************************************************/
 /************************************************************************/
 }

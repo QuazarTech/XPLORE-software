@@ -243,6 +243,8 @@ void Comm::interpret (const void* data, uint16_t size)
 		&Comm::VM_getTerminalCB,
 
 		&Comm::changeBaudCB,
+		&Comm::recSizeCB,
+		&Comm::recDataCB,
 	};
 
 	if (size < sizeof (CommPacket))
@@ -767,6 +769,29 @@ void Comm::changeBaudCB (const void* data, uint16_t size)
 		CommCB_changeBaud (res->baudRate()));
 }
 
+void Comm::recSizeCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_recSize))
+		return;
+
+	const CommResponse_recSize* res =
+		reinterpret_cast<const CommResponse_recSize*> (data);
+
+	do_callback (new (&callbackObject_)
+		CommCB_recSize (res->recSize()));
+}
+
+void Comm::recDataCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_recData))
+		return;
+
+	const CommResponse_recData* res =
+		reinterpret_cast<const CommResponse_recData*> (data);
+
+	do_callback (new (&callbackObject_)
+		CommCB_recData (res->recData()));
+}
 /************************************************************************/
 /************************************************************************/
 
