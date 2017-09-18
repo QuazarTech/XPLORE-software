@@ -13,6 +13,7 @@
 
 #include <bitset>
 #include <stdint.h>
+#include <future>
 
 namespace smu {
 
@@ -58,7 +59,9 @@ class Driver {
 	/***************************************************/
 
 	void identify (float* timeout);
+
 	void keepAlive (uint32_t* lease_time_ms, float* timeout);
+	void thread (void);
 
 	void setSourceMode (SourceMode* mode, float* timeout);
 
@@ -253,6 +256,8 @@ class Driver {
 
 private:
 	uint32_t baudRate_;
+	bool _alive;
+	std::future<void> _thread_future;
 
 };
 
