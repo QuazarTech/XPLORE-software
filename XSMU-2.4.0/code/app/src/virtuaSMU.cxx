@@ -601,7 +601,6 @@ void Driver::recSizeCB (const CommCB* oCB)
 
 	recSize_ =  o->recSize();
 
-	comm_->setBaudRate (recSize_);
 	ackBits_.set (COMM_CBCODE_REC_SIZE);
 }
 
@@ -612,11 +611,20 @@ void Driver::recDataCB (const CommCB* oCB)
 	const CommCB_recData* o =
 	reinterpret_cast<const CommCB_recData*> (oCB);
 
-	recData_ =  o->recData();
+	uint16_t size = o->dataSize(); //Size of data sent in this packet
+	const int32_t* data = o->recData(); //Pointer to data in this packet
 
-	comm_->setBaudRate (recData_);
+	std::lock_guard<std::mutex> lock(_dataq_lock);
+
+	for (uint16_t i = 0; i < size; ++i)
+	{
+		_dataq.push(data[i]);
+	}
+	//std::copy (data, data + size, _dataq);
+
 	ackBits_.set (COMM_CBCODE_REC_DATA);
 }
+
 /************************************************************************/
 /************************************************************************/
 
@@ -1411,33 +1419,49 @@ void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 
 /************************************************************************/
 
-void Driver::recSize (uint32_t* recSize, float* timeout)
+void Driver::recSize (float* timeout)
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_REC_SIZE);
 
-	comm_->transmit_recSize (*recSize);
+	comm_->transmit_recSize();
 
-	if (waitForResponse (COMM_CBCODE_REC_SIZE, timeout))
-		*recSize = recSize_;
+	waitForResponse (COMM_CBCODE_REC_SIZE, timeout);
 }
 
 /************************************************************************/
 
-void Driver::recData (int32_t* recData, float* timeout)
+void Driver::recData (float* timeout)
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_REC_DATA);
 
-	comm_->transmit_recData (**recData);
+	comm_->transmit_recData (recSize_);
 
-	if (waitForResponse (COMM_CBCODE_REC_DATA, timeout))
-		*recData = recData_;
+	waitForResponse (COMM_CBCODE_REC_DATA, timeout);
 }
+
+/************************************************************************/
+
+std::vector<float> Driver::getData (void)
+{
+	std::vector<float> data;
+
+	std::lock_guard<std::mutex> lock(_dataq_lock);
+
+	while (!_dataq.empty())
+	{
+		//TODO :data.push_back (ADC_to_VM (_dataq.front()));
+		_dataq.pop();
+	}
+
+	return data;
+}
+
 /************************************************************************/
 /************************************************************************/
 }

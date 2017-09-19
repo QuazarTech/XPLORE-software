@@ -14,6 +14,8 @@
 #include <bitset>
 #include <stdint.h>
 #include <future>
+#include <mutex>
+#include <queue>
 
 namespace smu {
 
@@ -170,8 +172,9 @@ class Driver {
 	/***************************************************/
 
 	void changeBaud (uint32_t* baudRate, float* timeout);
-	void recSize (uint32_t* recSize, float* timeout);
-	void recData (int32_t* recData, float* timeout);
+
+	void recSize (float* timeout);
+	void recData (float* timeout);
 
 	/***************************************************/
  public:
@@ -262,6 +265,16 @@ private:
 	uint32_t baudRate_;
 	bool _alive;
 	std::future<void> _thread_future;
+
+private:
+
+	uint16_t recSize_;           //Stores size of available data with FW
+	std::queue<int32_t> _dataq;  //Stores data obtained from FW
+	std::mutex _dataq_lock;
+
+public:
+	std::vector<float> getData (void);
+
 
 };
 

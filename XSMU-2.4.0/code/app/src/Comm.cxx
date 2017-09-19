@@ -790,7 +790,7 @@ void Comm::recDataCB (const void* data, uint16_t size)
 		reinterpret_cast<const CommResponse_recData*> (data);
 
 	do_callback (new (&callbackObject_)
-		CommCB_recData (res->recData()));
+		CommCB_recData (res->dataSize(), res->recData()));
 }
 /************************************************************************/
 /************************************************************************/
@@ -1446,6 +1446,41 @@ void Comm::transmit_changeBaud (uint32_t baudRate)
 
 	qp4_->transmitter().free_packet (req);
 }
+
+/************************************************************************/
+
+void Comm::transmit_recSize (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_recSize));
+
+	new (req->body())
+		CommRequest_recSize();
+
+	req->seal();
+	transmit (req);
+
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_recData (uint16_t recSize)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_recData));
+
+	new (req->body())
+		CommRequest_recData (recSize);
+
+	req->seal();
+	transmit (req);
+
+	qp4_->transmitter().free_packet (req);
+}
+
 /************************************************************************/
 /************************************************************************/
 } // namespace smu

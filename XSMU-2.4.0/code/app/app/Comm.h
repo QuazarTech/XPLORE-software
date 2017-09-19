@@ -1623,12 +1623,8 @@ protected:
 class CommRequest_recSize : public CommPacket_recSize
 {
 public:
-	CommRequest_recSize (uint32_t recSize) :
-		recSize_ (smu::hton (recSize))
+	CommRequest_recSize (void)
 	{}
-
-private:
-	uint32_t recSize_;
 };
 
 class CommResponse_recSize : public CommPacket_recSize
@@ -1637,10 +1633,10 @@ private:
 	CommResponse_recSize (void);
 
 public:
-	uint32_t recSize (void) const {return smu::ntoh(recSize_);}
+	uint16_t recSize (void) const {return smu::ntoh(recSize_);}
 
 private:
-	uint32_t recSize_;
+	uint16_t recSize_;
 };
 
 /************************************************************************/
@@ -1656,12 +1652,12 @@ protected:
 class CommRequest_recData : public CommPacket_recData
 {
 public:
-	CommRequest_recData (int32_t *recData) :
-		recData_ (smu::hton (recData))
+	CommRequest_recData (uint16_t recSize) :
+		recSize_ (smu::hton (recSize))
 	{}
 
 private:
-	int32_t *recData_;
+	uint16_t recSize_;
 };
 
 class CommResponse_recData : public CommPacket_recData
@@ -1670,10 +1666,22 @@ private:
 	CommResponse_recData (void);
 
 public:
-	int32_t *recData (void) const {return smu::ntoh(recData_);}
+	uint16_t dataSize (void) const {return smu::ntoh(size_);}
+
+	int32_t * recData (void) const
+	{
+		for (uint16_t i = 0; i < sizeof(recData_)/sizeof(recData_[0]); ++i)
+		{
+			hostData_[i] = smu::ntoh(recData_[i]);
+		}
+
+		return (hostData_);
+	}
 
 private:
-	int32_t *recData_;
+	uint16_t size_;
+	int32_t recData_[];
+	mutable int32_t hostData_ [sizeof(recData_) / sizeof(recData_[0])];
 };
 
 /************************************************************************/
@@ -2510,15 +2518,19 @@ private:
 class CommCB_recData : public CommCB
 {
 public:
-	CommCB_recData (int32_t *recData) :
+	CommCB_recData (uint16_t size, int32_t *recData) :
 		CommCB (COMM_CBCODE_REC_DATA),
+		size_ (size),
 		recData_ (recData)
+
 	{}
 
 public:
+	uint16_t dataSize (void) const {return size_;}
 	int32_t *recData (void) const {return recData_;}
 
 private:
+	uint16_t size_;
 	int32_t *recData_;
 };
 
@@ -2674,8 +2686,8 @@ public:
 	/********************************/
 
 	void transmit_changeBaud     (uint32_t baudRate);
-	void transmit_recSize (uint32_t recSize);
-	void transmit_recData (int32_t *recData);
+	void transmit_recSize (void);
+	void transmit_recData (uint16_t recSize);
 
 private:
 	QP4* qp4_;

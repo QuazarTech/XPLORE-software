@@ -253,8 +253,8 @@ void VM_getTerminal(int deviceID, float timeout,
 void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 				unsigned int *ret_baudRate, float *ret_timeout);
 
-void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout, unsigned int *ret_lease_time_ms, float *ret_timeout);
-
+void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
+				unsigned int *ret_lease_time_ms, float *ret_timeout);
 
 #ifdef __cplusplus
 }				// extern "C"
