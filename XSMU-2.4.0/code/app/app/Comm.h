@@ -1666,22 +1666,21 @@ private:
 	CommResponse_recData (void);
 
 public:
-	uint16_t dataSize (void) const {return smu::ntoh(size_);}
+	uint16_t size (void) const {return smu::ntoh(size_);}
 
 	int32_t * recData (void) const
 	{
-		for (uint16_t i = 0; i < sizeof(recData_)/sizeof(recData_[0]); ++i)
+		for (uint16_t i = 0; i < size_; ++i)
 		{
-			hostData_[i] = smu::ntoh(recData_[i]);
+			recData_[i] = smu::ntoh(recData_[i]);
 		}
 
-		return (hostData_);
+		return (recData_);
 	}
 
 private:
 	uint16_t size_;
-	int32_t recData_[];
-	mutable int32_t hostData_ [sizeof(recData_) / sizeof(recData_[0])];
+	mutable int32_t recData_[];
 };
 
 /************************************************************************/
@@ -2526,7 +2525,7 @@ public:
 	{}
 
 public:
-	uint16_t dataSize (void) const {return size_;}
+	uint16_t size (void) const {return size_;}
 	int32_t *recData (void) const {return recData_;}
 
 private:

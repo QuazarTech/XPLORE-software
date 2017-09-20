@@ -611,7 +611,7 @@ void Driver::recDataCB (const CommCB* oCB)
 	const CommCB_recData* o =
 	reinterpret_cast<const CommCB_recData*> (oCB);
 
-	uint16_t size = o->dataSize(); //Size of data sent in this packet
+	uint16_t size = o->size(); //Size of data sent in this packet
 	const int32_t* data = o->recData(); //Pointer to data in this packet
 
 	std::lock_guard<std::mutex> lock(_dataq_lock);
@@ -620,7 +620,6 @@ void Driver::recDataCB (const CommCB* oCB)
 	{
 		_dataq.push(data[i]);
 	}
-	//std::copy (data, data + size, _dataq);
 
 	ackBits_.set (COMM_CBCODE_REC_DATA);
 }
@@ -768,7 +767,7 @@ void Driver::thread (void)
 	Timer timer;
 
 	uint32_t lease_time_ms = 10000;
-	float timeout = 1;
+	float timeout = 2;
 
 	keepAlive (&lease_time_ms, &timeout);
 	double last_sent_at = timer.get();
@@ -1419,7 +1418,7 @@ void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 
 /************************************************************************/
 
-void Driver::recSize (float* timeout)
+void Driver::recSize (uint16_t* recSize, float* timeout)
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
@@ -1428,19 +1427,22 @@ void Driver::recSize (float* timeout)
 
 	comm_->transmit_recSize();
 
-	waitForResponse (COMM_CBCODE_REC_SIZE, timeout);
+	if (waitForResponse (COMM_CBCODE_REC_SIZE, timeout))
+		*recSize = recSize_;
 }
 
 /************************************************************************/
 
-void Driver::recData (float* timeout)
+void Driver::recData (uint16_t* recSize, float* timeout)
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_REC_DATA);
 
-	comm_->transmit_recData (recSize_);
+	*recSize = recSize_;
+
+	comm_->transmit_recData (*recSize);
 
 	waitForResponse (COMM_CBCODE_REC_DATA, timeout);
 }
@@ -1455,11 +1457,25 @@ std::vector<float> Driver::getData (void)
 
 	while (!_dataq.empty())
 	{
-		//TODO :data.push_back (ADC_to_VM (_dataq.front()));
+		data.push_back(_dataq.front());
 		_dataq.pop();
 	}
 
 	return data;
+}
+
+/************************************************************************/
+
+void Driver::startRec (void)
+{
+	_rec = true;
+	PRINT_DEBUG ("REC : " << _rec);
+}
+
+void Driver::stopRec (void)
+{
+	_rec = false;
+	PRINT_DEBUG ("REC : " << _rec);
 }
 
 /************************************************************************/

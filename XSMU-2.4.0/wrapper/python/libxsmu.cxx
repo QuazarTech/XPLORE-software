@@ -873,6 +873,32 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 
 /************************************************************************/
 
+// void getData (int deviceID, std::vector<float> *ret_data)
+// {
+// 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+//
+// 	std::vector<float> data_;
+//
+// 	data_ = virtuaSMU->getData();
+//
+// 	*ret_data = data_;
+// }
+
+void startRec (int deviceID)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+	virtuaSMU->startRec();
+}
+
+void stopRec (int deviceID)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+	virtuaSMU->stopRec();
+}
+
+/************************************************************************/
+//Only for testing
+
 void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 				unsigned int *ret_lease_time_ms, float *ret_timeout)
 {
@@ -889,6 +915,24 @@ void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
         return;
 
 	*ret_lease_time_ms = lease_time_ms_;
+}
+
+void recSize (int deviceID, float timeout,
+			  short unsigned int *ret_recSize, float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	short unsigned int recSize_;
+	float timeout_ = timeout;
+
+	virtuaSMU->recSize (&recSize_, &timeout_);
+
+	*ret_recSize = 0;
+
+	if ((*ret_timeout = timeout_) == 0)
+        return;
+
+	*ret_recSize = recSize_;
 }
 
 /************************************************************************/

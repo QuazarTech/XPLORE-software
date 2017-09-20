@@ -173,8 +173,8 @@ class Driver {
 
 	void changeBaud (uint32_t* baudRate, float* timeout);
 
-	void recSize (float* timeout);
-	void recData (float* timeout);
+	void recSize (uint16_t* recSize, float* timeout);
+	void recData (uint16_t* size, float* timeout);
 
 	/***************************************************/
  public:
@@ -274,8 +274,11 @@ private:
 
 public:
 	std::vector<float> getData (void);
+	void startRec (void);
+	void stopRec (void);
 
-
+private:
+	bool _rec;
 };
 
 /************************************************************************/

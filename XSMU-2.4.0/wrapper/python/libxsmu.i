@@ -1,8 +1,15 @@
 %module libxsmu
 %include "typemaps.i"
+%include "std_vector.i"
+%include "stdint.i"
 %{
 #include "libxsmu.h"
 %}
+
+namespace std
+{
+  %template(FloatVector) vector<float>;
+}
 
 %{
 
@@ -212,6 +219,12 @@ extern void keepAlive (int deviceID, unsigned int lease_time_ms,
 						float timeout, unsigned int *ret_lease_time_ms,
 						float *ret_timeout);
 
+extern void startRec (int deviceID);
+
+extern void stopRec (int deviceID);
+
+extern void recSize (int deviceID, float timeout,
+						short unsigned int *ret_recSize, float *ret_timeout);
 /**************************************************************/
 
 %}
@@ -394,6 +407,13 @@ extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 
 extern void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 							unsigned int *OUTPUT, float *OUTPUT);
+
+extern void startRec (int deviceID);
+
+extern void stopRec (int deviceID);
+
+extern void recSize (int deviceID, float timeout,
+							short unsigned int *OUTPUT, float *OUTPUT);
 
 /**************************************************************/
 /**************************************************************/

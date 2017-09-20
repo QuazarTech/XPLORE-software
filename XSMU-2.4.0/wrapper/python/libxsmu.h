@@ -249,13 +249,74 @@ void VM_getTerminal(int deviceID, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout);
 
 /************************************************************************/
+/**
+ * \brief Changes the Baud Rate of communication between the computer and the SMU.
+ *
+ * \return Current Baud Rate of communcation if a valid Baud Rate was provided.
+ * Otherwise, a NoOperation() exception is thrown.
+ *
+ */
 
 void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 				unsigned int *ret_baudRate, float *ret_timeout);
+/************************************************************************/
+/**
+ * \brief Gets data streamed from the SMU.
+ *
+ * \return C++ Vector containing streamed data from the SMU as float type
+ *
+ * This function will only return non-zero data when the \ref startRec function has been called, that starts streaming data from the SMU.
+ *
+ */
+
+//void getData (int deviceID, std::vector<float> *ret_data);
+
+/************************************************************************/
+/**
+ * \brief Starts recording streamed data from the SMU
+ *
+ * \return None
+ *
+ * This function sets a flag in the driver, to start recording streamed data from the SMU.
+ */
+
+void startRec (int deviceID);
+/************************************************************************/
+/**
+ * \brief Stops recording streamed data from the SMU
+ *
+ * \return None
+ *
+ * This function unsets a flag in the driver, to stop recording streamed data from the SMU.
+ */
+
+void stopRec (int deviceID);
+
+/************************************************************************/
+/**
+ * \brief Sends a KEEP_ALIVE packet to the SMU, asking the SMU to communcate as usual
+ * for the next \ref lease_time_ms milliseconds
+ *
+ * \return The duration for which the SMU has been asked to keep alive.
+ *
+ */
 
 void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 				unsigned int *ret_lease_time_ms, float *ret_timeout);
 
+/************************************************************************/
+/**
+ * \brief Queries the number of datapoints in the standby data queue in the SMU
+ *
+ * \return Number of datapoints in the standby data queue in the SMU
+ *
+ */
+
+void recSize (int deviceID, float timeout,
+			  short unsigned int *ret_recSize, float *ret_timeout);
+
+/************************************************************************/
+/************************************************************************/
 #ifdef __cplusplus
 }				// extern "C"
 
