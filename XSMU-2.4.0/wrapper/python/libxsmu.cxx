@@ -927,8 +927,6 @@ void recSize (int deviceID, float timeout,
 
 	virtuaSMU->recSize (&recSize_, &timeout_);
 
-	*ret_recSize = 0;
-
 	if ((*ret_timeout = timeout_) == 0)
         return;
 
