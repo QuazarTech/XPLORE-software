@@ -280,7 +280,7 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
  * This function sets a flag in the driver, to start recording streamed data from the SMU.
  */
 
-void startRec (int deviceID);
+//void startRec (int deviceID);
 /************************************************************************/
 /**
  * \brief Stops recording streamed data from the SMU
@@ -314,6 +314,17 @@ void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 
 void recSize (int deviceID, float timeout,
 			  short unsigned int *ret_recSize, float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Queries the data in the standby data queue in the SMU
+ *
+ * \return Number of datapoints being transmitted by the SMU
+ *
+ */
+
+void recData (int deviceID, float timeout,
+				short unsigned int *ret_recSize, float *ret_timeout);
 
 /************************************************************************/
 /************************************************************************/

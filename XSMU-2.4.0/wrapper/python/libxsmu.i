@@ -225,6 +225,10 @@ extern void stopRec (int deviceID);
 
 extern void recSize (int deviceID, float timeout,
 						short unsigned int *ret_recSize, float *ret_timeout);
+
+extern void recData (int deviceID, float timeout,
+						short unsigned int *ret_recSize, float *ret_timeout);
+
 /**************************************************************/
 
 %}
@@ -412,7 +416,7 @@ extern void startRec (int deviceID);
 
 extern void stopRec (int deviceID);
 
-extern void recSize (int deviceID, float timeout,
+extern void recData (int deviceID, float timeout,
 							short unsigned int *OUTPUT, float *OUTPUT);
 
 /**************************************************************/

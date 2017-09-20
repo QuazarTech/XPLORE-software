@@ -1404,6 +1404,11 @@ void Driver::VM_getTerminal (VM_Terminal* terminal, float* timeout)
 /************************************************************************/
 
 void Driver::changeBaud (uint32_t* baudRate, float* timeout)
+/*
+ * Transmits a request for a change in the baudrate of communication
+ * channel; waits for acknowledgement of a change in baudrate in the
+ * firmware
+ */
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
@@ -1419,6 +1424,11 @@ void Driver::changeBaud (uint32_t* baudRate, float* timeout)
 /************************************************************************/
 
 void Driver::recSize (uint16_t* recSize, float* timeout)
+/*
+ * Transmits a request for the size of standby data queue stored in the
+ * SMU RAM, through the communication channel; and waits for a response
+ * within timeout duration.
+ */
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
@@ -1434,6 +1444,11 @@ void Driver::recSize (uint16_t* recSize, float* timeout)
 /************************************************************************/
 
 void Driver::recData (uint16_t* recSize, float* timeout)
+/*
+ * Transmits a request for data stored in the data queue in SMU RAM,
+ * through the communication channel; and waits for a response
+ * within timeout duration.
+ */
 {
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
@@ -1450,6 +1465,12 @@ void Driver::recData (uint16_t* recSize, float* timeout)
 /************************************************************************/
 
 std::vector<float> Driver::getData (void)
+/*
+ * Passes streamed data stored in the Driver to the Application layer.
+ * Data stored in the queue is cleared as it passed to the user.
+ *
+ * Output : std::vector<float>
+ */
 {
 	std::vector<float> data;
 
@@ -1467,12 +1488,20 @@ std::vector<float> Driver::getData (void)
 /************************************************************************/
 
 void Driver::startRec (void)
+/*
+ * Sets a flag to instruct the SMU to start streaming data, and the driver
+ * to start recording the streamed data.
+ */
 {
 	_rec = true;
 	PRINT_DEBUG ("REC : " << _rec);
 }
 
 void Driver::stopRec (void)
+/*
+ * Unsets a flag to instruct the SMU to stop streaming data, and the driver
+ * to stop recording.
+ */
 {
 	_rec = false;
 	PRINT_DEBUG ("REC : " << _rec);

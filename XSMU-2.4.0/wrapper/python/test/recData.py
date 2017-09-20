@@ -36,13 +36,13 @@ sleep (5)
 
 timeout = 5.0
 
-recSize, timeout = libxsmu.recSize (deviceID, timeout)
+recSize, timeout = libxsmu.recData (deviceID, timeout)
 print \
 	"recSize: ", recSize, "\n" \
 	"Timeout: ", timeout
 
 if (timeout == 0.0):
-	print 'Communication timeout in recSize'
+	print 'Communication timeout in recData'
 	exit (-2)
 
 ##########################################################################

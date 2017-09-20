@@ -989,6 +989,7 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 ```
 - Added std::launch::async as argument to std::async to always set asynchronous operation of thread.
 - Fixed bug in `Driver::thread()` to convert ms into seconds for comparison inside while look
+- Result : Passed
 - Output :
 
 	```
@@ -1105,6 +1106,7 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 ---
 - Testing for REC_SIZE
 - ``python wrapper/test/python/recSize.py`
+- Result : Passed
 - Output :
 
 	```
@@ -1131,6 +1133,7 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 
 - Testing for START_REC and STOP_REC
 - `python wrapper/test/python/startRec.py`
+- Result : Passed
 - Output :
 	```
 	libxsmu version: 2.1.2
@@ -1152,4 +1155,31 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 	void smu::Driver::stopRec():1478:REC : 0
 	Stopped Recording Streamed Data
 	void smu::Driver::close():664:Closing Device
+	```
+---
+
+- Testing for REC_DATA
+- `python wrapper/test`
+- Result : Failed
+- Output :
+
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	void smu::Driver::open(const char*, float*):632:Opening Device
+	libxsmu version: 2.1.2
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):658:Async thread launched
+	Device ID     : 0
+	goodID        : 1void smu::Driver::keepAlive(uint32_t*, float*):755:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*)
+	Remaining time: :757:0.866751909256Lock Acquired
+	sec
+
+	void smu::Driver::recData(uint16_t*, float*):1454:Lock Acquired
+	recSize:  0
+	Timeout:  0.0
+	Communication timeout in recData
 	```
