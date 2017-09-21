@@ -1461,6 +1461,7 @@ void Driver::recData (uint16_t* size, float* timeout)
 	*size = recSize_;
 
 	comm_->transmit_recData (*size);
+	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 
 	waitForResponse (COMM_CBCODE_REC_DATA, timeout);
 }

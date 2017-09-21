@@ -32,9 +32,9 @@ if (timeout == 0.0) or (not goodID):
 sleep (5)
 
 ##########################################################################
-# Queries the number of datapoints stored in standby data queue in SMU
+# Queries the data stored in standby data queue in SMU
 
-timeout = 5.0
+timeout = 10.0
 
 recSize, timeout = libxsmu.recData (deviceID, timeout)
 print \
