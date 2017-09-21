@@ -784,8 +784,15 @@ void Comm::recSizeCB (const void* data, uint16_t size)
 
 void Comm::recDataCB (const void* data, uint16_t size)
 {
+	PRINT_DEBUG ("Size : " << size << "Expected : " << sizeof(CommRequest_recData))
+
 	if (size < sizeof (CommResponse_recData))
+	{
+		PRINT_DEBUG ("SIZE NOT OKAY")
 		return;
+	}
+
+	PRINT_DEBUG ("SIZE OKAY")
 
 	const CommResponse_recData* res =
 		reinterpret_cast<const CommResponse_recData*> (data);
@@ -798,6 +805,8 @@ void Comm::recDataCB (const void* data, uint16_t size)
 	{
 		recData.push_back (res->recData(i));
 	}
+
+	PRINT_DEBUG ("VECTOR CONSTRUCTED")
 
 	do_callback (new (&callbackObject_)
 		CommCB_recData (n, recData));

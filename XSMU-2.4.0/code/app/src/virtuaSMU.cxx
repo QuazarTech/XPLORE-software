@@ -608,12 +608,15 @@ void Driver::recSizeCB (const CommCB* oCB)
 
 void Driver::recDataCB (const CommCB* oCB)
 {
+	PRINT_DEBUG ("CB started")
+
 	const CommCB_recData* o =
 	reinterpret_cast<const CommCB_recData*> (oCB);
 
 	uint16_t size = o->size(); //Size of data sent in this packet
 	std::vector<int32_t> data = o->recData(); //Data in this packet
 
+	PRINT_DEBUG ("Trying to acquire dataq lock")
 	std::lock_guard<std::mutex> lock(_dataq_lock);
 
 	for (uint16_t i = 0; i < size; ++i)
@@ -621,6 +624,8 @@ void Driver::recDataCB (const CommCB* oCB)
 		_dataq_32.push (data[i]);
 		_dataq.push (applyCalibration (data[i]));
 	}
+
+	PRINT_DEBUG ("Written to dataq")
 
 	ackBits_.set (COMM_CBCODE_REC_DATA);
 }
