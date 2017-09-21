@@ -935,12 +935,12 @@ void recSize (int deviceID, float timeout,
 	*ret_recSize = recSize_;
 }
 
-void recData (int deviceID, float timeout,
+void recData (int deviceID, short unsigned int size, float timeout,
 			  short unsigned int *ret_size, float *ret_timeout)
 {
 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
 
-	short unsigned int size_;
+	short unsigned int size_ = size;
 	float timeout_ = timeout;
 
 	virtuaSMU->recData (&size_, &timeout_);

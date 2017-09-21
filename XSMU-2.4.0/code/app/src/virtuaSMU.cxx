@@ -1456,10 +1456,6 @@ void Driver::recData (uint16_t* size, float* timeout)
 
 	ackBits_.reset (COMM_CBCODE_REC_DATA);
 
-	// Assuming that size of stored data is already stored in recSize_
-	// Always call recSize() before recData() (in thread())
-	*size = recSize_;
-
 	comm_->transmit_recData (*size);
 	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 

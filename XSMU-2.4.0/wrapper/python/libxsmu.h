@@ -323,7 +323,7 @@ void recSize (int deviceID, float timeout,
  *
  */
 
-void recData (int deviceID, float timeout,
+void recData (int deviceID, short unsigned int size, float timeout,
 				short unsigned int *ret_size, float *ret_timeout);
 
 /************************************************************************/
