@@ -612,13 +612,14 @@ void Driver::recDataCB (const CommCB* oCB)
 	reinterpret_cast<const CommCB_recData*> (oCB);
 
 	uint16_t size = o->size(); //Size of data sent in this packet
-	const int32_t* data = o->recData(); //Pointer to data in this packet
+	std::vector<int32_t> data = o->recData(); //Data in this packet
 
 	std::lock_guard<std::mutex> lock(_dataq_lock);
 
 	for (uint16_t i = 0; i < size; ++i)
 	{
-		_dataq.push(data[i]);
+		_dataq_32.push (data[i]);
+		_dataq.push (applyCalibration (data[i]));
 	}
 
 	ackBits_.set (COMM_CBCODE_REC_DATA);
@@ -1443,7 +1444,7 @@ void Driver::recSize (uint16_t* recSize, float* timeout)
 
 /************************************************************************/
 
-void Driver::recData (uint16_t* recSize, float* timeout)
+void Driver::recData (uint16_t* size, float* timeout)
 /*
  * Transmits a request for data stored in the data queue in SMU RAM,
  * through the communication channel; and waits for a response
@@ -1455,9 +1456,11 @@ void Driver::recData (uint16_t* recSize, float* timeout)
 
 	ackBits_.reset (COMM_CBCODE_REC_DATA);
 
-	*recSize = recSize_;
+	// Assuming that size of stored data is already stored in recSize_
+	// Always call recSize() before recData() (in thread())
+	*size = recSize_;
 
-	comm_->transmit_recData (*recSize);
+	comm_->transmit_recData (*size);
 
 	waitForResponse (COMM_CBCODE_REC_DATA, timeout);
 }
@@ -1480,6 +1483,7 @@ std::vector<float> Driver::getData (void)
 	{
 		data.push_back(_dataq.front());
 		_dataq.pop();
+		_dataq_32.pop();
 	}
 
 	return data;
@@ -1505,6 +1509,18 @@ void Driver::stopRec (void)
 {
 	_rec = false;
 	PRINT_DEBUG ("REC : " << _rec);
+}
+
+/************************************************************************/
+
+float Driver::applyCalibration (int32_t adc_value)
+/*
+ * Applys the calibration table (depending upon what physical quantity is
+ * being measured, and the range for the same; eg. current, 100uA range)
+ * to convert an ADC value into a voltage or current value
+ */
+{
+	return float (adc_value);
 }
 
 /************************************************************************/

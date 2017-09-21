@@ -268,8 +268,12 @@ private:
 
 private:
 
-	uint16_t recSize_;           //Stores size of available data with FW
-	std::queue<int32_t> _dataq;  //Stores data obtained from FW
+	uint16_t recSize_;             //Stores size of available data with FW
+	std::queue<int32_t> _dataq_32; //Stores ADC data obtained from FW
+
+	//Stores ADC data converted to float using calibration table
+	std::queue<float> _dataq;
+
 	std::mutex _dataq_lock;
 
 public:
@@ -279,6 +283,9 @@ public:
 
 private:
 	bool _rec;
+
+private:
+	float applyCalibration (int32_t adc_value);
 };
 
 /************************************************************************/

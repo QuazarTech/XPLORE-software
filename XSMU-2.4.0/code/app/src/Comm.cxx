@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 #define PRINT_DEBUG(x) { \
 std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":" << x << std::endl; }
@@ -789,8 +790,17 @@ void Comm::recDataCB (const void* data, uint16_t size)
 	const CommResponse_recData* res =
 		reinterpret_cast<const CommResponse_recData*> (data);
 
+	//Construct a std::vector<int32_t> from the recieved data array
+	uint16_t n = res->size();
+	std::vector<int32_t> recData (n);
+
+	for (uint16_t i = 0; i < n; ++i)
+	{
+		recData.push_back (res->recData(i));
+	}
+
 	do_callback (new (&callbackObject_)
-		CommCB_recData (res->size(), res->recData()));
+		CommCB_recData (n, recData));
 }
 /************************************************************************/
 /************************************************************************/
@@ -1466,14 +1476,18 @@ void Comm::transmit_recSize (void)
 
 /************************************************************************/
 
-void Comm::transmit_recData (uint16_t recSize)
+void Comm::transmit_recData (uint16_t size)
+/*
+ * Creates and transmits a CommRequest_recData packet, requesting for
+ * 'size' number of datapoints of recorded data to be transmitted
+ */
 {
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_recData));
 
 	new (req->body())
-		CommRequest_recData (recSize);
+		CommRequest_recData (size);
 
 	req->seal();
 	transmit (req);

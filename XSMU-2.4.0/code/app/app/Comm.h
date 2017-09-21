@@ -1652,12 +1652,12 @@ protected:
 class CommRequest_recData : public CommPacket_recData
 {
 public:
-	CommRequest_recData (uint16_t recSize) :
-		recSize_ (smu::hton (recSize))
+	CommRequest_recData (uint16_t size) :
+		size_ (smu::hton (size))
 	{}
 
 private:
-	uint16_t recSize_;
+	uint16_t size_;
 };
 
 class CommResponse_recData : public CommPacket_recData
@@ -1668,19 +1668,14 @@ private:
 public:
 	uint16_t size (void) const {return smu::ntoh(size_);}
 
-	int32_t * recData (void) const
+	int32_t recData (uint16_t idx) const
 	{
-		for (uint16_t i = 0; i < size_; ++i)
-		{
-			recData_[i] = smu::ntoh(recData_[i]);
-		}
-
-		return (recData_);
+		return smu::ntoh(recData_[idx]);
 	}
 
 private:
 	uint16_t size_;
-	mutable int32_t recData_[];
+	int32_t recData_[];
 };
 
 /************************************************************************/
@@ -2517,7 +2512,7 @@ private:
 class CommCB_recData : public CommCB
 {
 public:
-	CommCB_recData (uint16_t size, int32_t *recData) :
+	CommCB_recData (uint16_t size, std::vector<int32_t> recData) :
 		CommCB (COMM_CBCODE_REC_DATA),
 		size_ (size),
 		recData_ (recData)
@@ -2526,11 +2521,11 @@ public:
 
 public:
 	uint16_t size (void) const {return size_;}
-	int32_t *recData (void) const {return recData_;}
+	std::vector<int32_t> recData (void) const {return recData_;}
 
 private:
 	uint16_t size_;
-	int32_t *recData_;
+	std::vector<int32_t> recData_;
 };
 
 /************************************************************************/
