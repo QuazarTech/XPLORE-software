@@ -141,6 +141,8 @@ void Driver::comm_cb (const CommCB* oCB)
 		&Driver::changeBaudCB,
 		&Driver::recSizeCB,
 		&Driver::recDataCB,
+		&Driver::StartRecCB,
+		&Driver::StopRecCB,
 	};
 
 	if (oCB->code() < sizeof (cbs) / sizeof (cbs[0]))
@@ -628,6 +630,18 @@ void Driver::recDataCB (const CommCB* oCB)
 	PRINT_DEBUG ("Written to dataq")
 
 	ackBits_.set (COMM_CBCODE_REC_DATA);
+}
+
+/************************************************************************/
+
+void Driver::StartRecCB (const CommCB* oCB)
+{
+	ackBits_.set (COMM_CBCODE_START_REC);
+}
+
+void Driver::StopRecCB (const CommCB* oCB)
+{
+	ackBits_.set (COMM_CBCODE_STOP_REC);
 }
 
 /************************************************************************/
@@ -1493,24 +1507,44 @@ std::vector<float> Driver::getData (void)
 
 /************************************************************************/
 
-void Driver::startRec (void)
+void Driver::StartRec (float *timeout)
 /*
  * Sets a flag to instruct the SMU to start streaming data, and the driver
- * to start recording the streamed data.
+ * to start recording the streamed data. Then instructs the firmware to
+ * start streaming data from the ADC
  */
 {
 	_rec = true;
-	PRINT_DEBUG ("REC : " << _rec);
+
+	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
+
+	ackBits_.reset (COMM_CBCODE_START_REC);
+
+	comm_->transmit_StartRec();
+	PRINT_DEBUG ("Successfully transmitted, waiting for response")
+
+	waitForResponse (COMM_CBCODE_START_REC, timeout);
 }
 
-void Driver::stopRec (void)
+void Driver::StopRec (float *timeout)
 /*
  * Unsets a flag to instruct the SMU to stop streaming data, and the driver
- * to stop recording.
+ * to stop recording. Then instructs the firmware to stop streaming data
+ * from the ADC
  */
 {
 	_rec = false;
-	PRINT_DEBUG ("REC : " << _rec);
+
+	auto unique_lock = comm_->lock();
+	PRINT_DEBUG ("Lock Acquired")
+
+	ackBits_.reset (COMM_CBCODE_STOP_REC);
+
+	comm_->transmit_StopRec();
+	PRINT_DEBUG ("Successfully transmitted, waiting for response")
+
+	waitForResponse (COMM_CBCODE_STOP_REC, timeout);
 }
 
 /************************************************************************/

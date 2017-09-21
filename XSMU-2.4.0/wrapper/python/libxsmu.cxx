@@ -884,16 +884,26 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 // 	*ret_data = data_;
 // }
 
-void startRec (int deviceID)
+void StartRec (int deviceID, float timeout,
+				float *ret_timeout)
 {
 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
-	virtuaSMU->startRec();
+
+	float timeout_ = timeout;
+	virtuaSMU->StartRec(&timeout_);
+
+	*ret_timeout = timeout_;
 }
 
-void stopRec (int deviceID)
+void StopRec (int deviceID, float timeout,
+				float *ret_timeout)
 {
 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
-	virtuaSMU->stopRec();
+
+	float timeout_ = timeout;
+	virtuaSMU->StopRec(&timeout_);
+
+	*ret_timeout = timeout_;
 }
 
 /************************************************************************/

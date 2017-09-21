@@ -259,6 +259,7 @@ void VM_getTerminal(int deviceID, float timeout,
 
 void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 				unsigned int *ret_baudRate, float *ret_timeout);
+
 /************************************************************************/
 /**
  * \brief Gets data streamed from the SMU.
@@ -280,7 +281,9 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
  * This function sets a flag in the driver, to start recording streamed data from the SMU.
  */
 
-//void startRec (int deviceID);
+void StartRec (int deviceID, float timeout,
+			float *ret_timeout);
+
 /************************************************************************/
 /**
  * \brief Stops recording streamed data from the SMU
@@ -290,7 +293,8 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
  * This function unsets a flag in the driver, to stop recording streamed data from the SMU.
  */
 
-void stopRec (int deviceID);
+void StopRec (int deviceID, float timeout,
+			float *ret_timeout);
 
 /************************************************************************/
 /**

@@ -219,9 +219,11 @@ extern void keepAlive (int deviceID, unsigned int lease_time_ms,
 						float timeout, unsigned int *ret_lease_time_ms,
 						float *ret_timeout);
 
-extern void startRec (int deviceID);
+extern void StartRec (int deviceID, float timeout,
+						float *ret_timeout);
 
-extern void stopRec (int deviceID);
+extern void StopRec (int deviceID, float timeout,
+						float *ret_timeout);
 
 extern void recSize (int deviceID, float timeout,
 						short unsigned int *ret_recSize, float *ret_timeout);
@@ -412,9 +414,11 @@ extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 extern void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 							unsigned int *OUTPUT, float *OUTPUT);
 
-extern void startRec (int deviceID);
+extern void StartRec (int deviceID, float timeout,
+							float *OUTPUT);
 
-extern void stopRec (int deviceID);
+extern void StopRec (int deviceID, float timeout,
+							float *OUTPUT);
 
 extern void recSize (int deviceID, float timeout,
 							short unsigned int *OUTPUT, float *OUTPUT);

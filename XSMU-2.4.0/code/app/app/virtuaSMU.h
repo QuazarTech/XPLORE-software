@@ -173,8 +173,10 @@ class Driver {
 
 	void changeBaud (uint32_t* baudRate, float* timeout);
 
-	void recSize (uint16_t* recSize, float* timeout);
-	void recData (uint16_t* size, float* timeout);
+	void recSize  (uint16_t* recSize, float* timeout);
+	void recData  (uint16_t* size, float* timeout);
+	void StartRec (float* timeout);
+	void StopRec  (float* timeout);
 
 	/***************************************************/
  public:
@@ -247,6 +249,8 @@ class Driver {
 	void changeBaudCB (const CommCB* oCB);
 	void recSizeCB (const CommCB* oCB);
 	void recDataCB (const CommCB* oCB);
+	void StartRecCB (const CommCB* oCB);
+	void StopRecCB (const CommCB* oCB);
 
  private:
 	Comm* comm_;
@@ -278,8 +282,6 @@ private:
 
 public:
 	std::vector<float> getData (void);
-	void startRec (void);
-	void stopRec (void);
 
 private:
 	bool _rec;

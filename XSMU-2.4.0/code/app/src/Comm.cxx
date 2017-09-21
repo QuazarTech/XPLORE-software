@@ -246,6 +246,8 @@ void Comm::interpret (const void* data, uint16_t size)
 		&Comm::changeBaudCB,
 		&Comm::recSizeCB,
 		&Comm::recDataCB,
+		&Comm::StartRecCB,
+		&Comm::StopRecCB,
 	};
 
 	if (size < sizeof (CommPacket))
@@ -253,8 +255,6 @@ void Comm::interpret (const void* data, uint16_t size)
 
 	const CommPacket *packet =
 		reinterpret_cast<const CommPacket *> (data);
-
-	//PRINT_DEBUG ("Opcode: " << packet->opcode());
 
 	if (packet->opcode() < sizeof (cbs) / sizeof (cbs[0]))
 		(this->*cbs[packet->opcode()])(data, size);
@@ -745,7 +745,6 @@ void Comm::VM_setTerminalCB (const void* data, uint16_t size)
 		CommCB_VM_SetTerminal (res->terminal()));
 }
 
-
 void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_VM_GetTerminal))
@@ -757,6 +756,8 @@ void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_)
 		CommCB_VM_GetTerminal (res->terminal()));
 }
+
+/************************************************************************/
 
 void Comm::changeBaudCB (const void* data, uint16_t size)
 {
@@ -781,6 +782,8 @@ void Comm::recSizeCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_)
 		CommCB_recSize (res->recSize()));
 }
+
+/************************************************************************/
 
 void Comm::recDataCB (const void* data, uint16_t size)
 {
@@ -811,6 +814,27 @@ void Comm::recDataCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_)
 		CommCB_recData (n, recData));
 }
+
+/************************************************************************/
+
+void Comm::StartRecCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_StartRec))
+		return;
+
+	do_callback (new (&callbackObject_) CommCB_StartRec);
+}
+
+/************************************************************************/
+
+void Comm::StopRecCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_StopRec))
+		return;
+
+	do_callback (new (&callbackObject_) CommCB_StopRec);
+}
+
 /************************************************************************/
 /************************************************************************/
 
@@ -1501,6 +1525,38 @@ void Comm::transmit_recData (uint16_t size)
 	req->seal();
 	transmit (req);
 
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_StartRec (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_StartRec));
+
+	new (req->body())
+		CommRequest_StartRec;
+
+	req->seal();
+	transmit (req);
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_StopRec (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_StopRec));
+
+	new (req->body())
+		CommRequest_StopRec;
+
+	req->seal();
+	transmit (req);
 	qp4_->transmitter().free_packet (req);
 }
 

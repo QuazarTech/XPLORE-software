@@ -34,13 +34,16 @@ sleep (5)
 ##########################################################################
 # Start recording streamed data from the SMU
 
-libxsmu.startRec (deviceID)
+timeout = 5
+
+timeout = libxsmu.StartRec (deviceID, timeout)
 print \
 	"Started Recording Streamed Data"
 
 sleep(5)
+timeout = 5
 
-libxsmu.stopRec (deviceID)
+timeout = libxsmu.StopRec (deviceID, timeout)
 print \
 	"Stopped Recording Streamed Data"
 
