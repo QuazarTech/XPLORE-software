@@ -1637,6 +1637,7 @@ public:
 
 private:
 	uint16_t recSize_;
+	uint16_t recData_;
 };
 
 /************************************************************************/
@@ -1653,11 +1654,13 @@ class CommRequest_recData : public CommPacket_recData
 {
 public:
 	CommRequest_recData (uint16_t size) :
-		size_ (smu::hton (size))
+		size_ (smu::hton (size)),
+		reserve_ (0)
 	{}
 
 private:
 	uint16_t size_;
+	uint16_t reserve_;
 };
 
 class CommResponse_recData : public CommPacket_recData
@@ -1675,6 +1678,7 @@ public:
 
 private:
 	uint16_t size_;
+	uint16_t reserve_;
 	int32_t recData_[];
 };
 
