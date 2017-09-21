@@ -1296,3 +1296,179 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 	Timeout:  0.0:
 	758:Lock AcquiredCommunication timeout in recData
 	```
+
+
+- Implemented START_REC and STOP_REC down to firmware
+- New test (`wrapper/python/test/startRec.py`)
+- Result : Passed
+- Output :
+
+	```
+	libxsmu version: 2.1.2
+	Total device: 1
+	Seial number: XSMU012A
+	void smu::Driver::open(const char*, float*):652:Opening Device
+	libxsmu version: 2.1.2
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	2C ,
+	F9 �
+	12 
+	0
+	1 
+	0
+	0
+	58 X
+	50 P
+	4C L
+	4F O
+	52 R
+	45 E
+	20
+	53 S
+	4D M
+	55 U
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	4 
+	0
+	0
+	FF �
+	FF �
+	FF �
+	FD �
+	Hardware version: 4.0.0
+	Firmware version: 255.255.253
+	void smu::Driver::open(const char*, float*):678:Async thread launched
+	Device ID     : 0
+	goodID        : 1void smu::Driver::keepAlive(uint32_t*, float*): 775:
+	Remaining time:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):7770.886788845062 sec
+
+	:Lock Acquired
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	8
+	FF �
+	C7 �
+	0
+	2 
+	0
+	0
+	0
+	0
+	27 '
+	10 
+	void smu::Driver::keepAlive(uint32_t*, float*):775:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):777:Lock Acquired
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	8
+	FF �
+	C7 �
+	0
+	2 
+	0
+	0
+	0
+	0
+	27 '
+	10 
+	void smu::Driver::StartRec(float*):1520:Lock Acquired
+	void smu::Driver::StartRec(float*):1525:Successfully transmitted, waiting for response
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	4 
+	FF �
+	D2 �
+	0
+	2E .
+	0
+	0
+	Started Recording Streamed Data
+	void smu::Driver::keepAlive(uint32_t*, float*):775:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):777:Lock Acquired
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	8
+	FF �
+	C7 �
+	0
+	2 
+	0
+	0
+	0
+	0
+	27 '
+	10 
+	void smu::Driver::keepAlive(uint32_t*, float*):775:Trying to Acquire Lock
+	void smu::Driver::keepAlive(uint32_t*, float*):777:Lock Acquired
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	8
+	FF �
+	C7 �
+	0
+	2 
+	0
+	0
+	0
+	0
+	27 '
+	10 
+	void smu::Driver::StopRec(float*):1540:Lock Acquired
+	void smu::Driver::StopRec(float*):1545:Successfully transmitted, waiting for response
+	51 Q
+	50 P
+	34 4
+	31 1
+	0
+	4 
+	FF �
+	D1 �
+	0
+	2F /
+	0
+	0
+	Stopped Recording Streamed Data
+	void smu::Driver::close():684:Closing Device
+	```
