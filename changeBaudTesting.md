@@ -1472,3 +1472,577 @@ void smu::Driver::thread():736:Inside thread : Keep Alive sent
 	Stopped Recording Streamed Data
 	void smu::Driver::close():684:Closing Device
 	```
+
+- Testing REC_DATA again
+- Added more print statements to debug
+- Result : Failed
+- Output (only for recData function) :
+
+	```
+	void smu::Driver::recData(uint16_t*, float*):1474:Lock Acquired
+	void smu::Driver::recData(uint16_t*, float*):1479:Successfully transmitted, waiting for response
+	51 Q
+	50 P
+	34 4
+	31 1
+	1 
+	8
+	EA �
+	E1 �
+	0
+	2D -
+	0
+	0
+	0
+	1 
+	0
+	0
+	53 S
+	20
+	45 E
+	52 R
+	0
+	0
+	55 U
+	4D M
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	4 
+	0
+	FD �
+	FF �
+	FF �
+	FF �
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	3C <
+	23 #
+	D7 �
+	A
+
+	0
+	0
+	0
+	1 
+	0
+	0
+	0
+	0
+	8
+	2 
+	F0 �
+	14 
+	0
+	0
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	80 �
+	25 %
+	0
+	0
+	50 P
+	51 Q
+	0
+	FF �
+	8
+	0
+	31 1
+	0
+	2F /
+	0
+	D1 �
+	27 '
+	0
+	0
+	0
+	0
+	0
+	0
+	10 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	FF �
+	B3 �
+	4 
+	0
+	0
+	2D -
+	0
+	D2 �
+	0
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	10 
+	27 '
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	FF �
+	0
+	0
+	F5 �
+	4 
+	B3 �
+	4 
+	F5 �
+	4 
+	0
+	1 
+	4 
+	0
+	0
+	0
+	0
+	4 
+	AF �
+	AF �
+	4 
+	E7 �
+	10 
+	E3 �
+	1 
+	0
+	0
+	0
+	10 
+	1 
+	0
+	18 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	5
+	B8 �
+	void smu::Driver::keepAlive(uint32_t*, float*):775:Trying to Acquire Lock
+	recSize:  void smu::Driver::keepAlive(uint32_t*, float*)0:777
+	Timeout:  :Lock Acquired0.0
+
+	Communication timeout in recData
+	```
+- Retest
+- Result : Failed
+- Output :
+	```
+	void smu::Driver::recData(uint16_t*, float*):1474:Lock Acquired
+	void smu::Driver::recData(uint16_t*, float*):1479:Successfully transmitted, waiting for response
+	51 Q
+	50 P
+	34 4
+	31 1
+	1 
+	8
+	E7 �
+	16 
+	0
+	2D -
+	0
+	0
+	0
+	1 
+	0
+	0
+	53 S
+	20
+	45 E
+	52 R
+	0
+	0
+	55 U
+	4D M
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	4 
+	0
+	FD �
+	FF �
+	FF �
+	FF �
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	3C <
+	23 #
+	D7 �
+	A
+
+	1 
+	0
+	0
+	1 
+	0
+	0
+	0
+	0
+	1C 
+	F0 �
+	55 U
+	B
+
+	0
+	1 
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	80 �
+	25 %
+	0
+	0
+	50 P
+	51 Q
+	0
+	FF �
+	8
+	0
+	31 1
+	0
+	2D -
+	0
+	D2 �
+	0
+	1 
+	0
+	0
+	10 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	51 Q
+	B3 �
+	4 
+	FF �
+	0
+	31 1
+	34 4
+	50 P
+	0
+	C7 �
+	FF �
+	8
+	0
+	0
+	0
+	2 
+	0
+	10 
+	27 '
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	F5 �
+	0
+	0
+	F5 �
+	4 
+	B3 �
+	4 
+	F5 �
+	4 
+	0
+	1 
+	4 
+	0
+	0
+	0
+	0
+	4 
+	AF �
+	AF �
+	4 
+	1 
+	E3 �
+	10 
+	E7 �
+	10 
+	0
+	0
+	0
+	0
+	18 
+	0
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	1 
+	0
+	0
+	0
+	0
+	0
+	0
+	0
+	B8 �
+	5
+	0
+	0
+	void smu::Driver::keepAlive(uint32_t*, float*):775:Trying to Acquire Lock
+	recSize:  void smu::Driver::keepAlive(uint32_t*, float*):0
+	Timeout:  7770.0
+	Communication timeout in recData
+	:Lock Acquired
+	```
