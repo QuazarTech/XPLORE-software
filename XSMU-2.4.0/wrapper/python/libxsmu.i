@@ -219,6 +219,8 @@ extern void keepAlive (int deviceID, unsigned int lease_time_ms,
 						float timeout, unsigned int *ret_lease_time_ms,
 						float *ret_timeout);
 
+extern std::vector<float> getData (int deviceID);
+
 extern void StartRec (int deviceID, float timeout,
 						float *ret_timeout);
 
@@ -413,6 +415,8 @@ extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 
 extern void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
 							unsigned int *OUTPUT, float *OUTPUT);
+
+extern std::vector<float> getData (int deviceID);
 
 extern void StartRec (int deviceID, float timeout,
 							float *OUTPUT);

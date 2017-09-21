@@ -30,19 +30,14 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
-# Set Baud Rate of communication
+# Get streamed data from data queue
 
-timeout = 5.0
-baudRate = 9600
+data = libxsmu.getData (deviceID)
 
-baudRate, timeout = libxsmu.changeBaud (deviceID, baudRate, timeout)
-print \
-	"Baud Rate: ", baudRate, "\n" \
-	"Timeout: ", timeout
+print "Data : "
 
-if (timeout == 0.0):
-	print 'Communication timeout in changeBaud'
-	exit (-2)
+for item in data:
+	print "\t", item, "\n"
 
 ##########################################################################
 # closes the device.

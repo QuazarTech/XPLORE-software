@@ -389,6 +389,16 @@ void Driver::VM_setRangeCB (const CommCB* oCB)
 
 	vm_->setRange (toVM_Range (o->range()));
 	ackBits_.set (COMM_CBCODE_VM_SET_RANGE);
+
+	//TODO : How do I replace the number 5 here?
+	for (uint16_t index = 0; index < 5; ++index)
+	{
+		int32_t adc;
+		float voltage;
+		float timeout = 1;
+		VM_getCalibration (&index, &adc, &voltage, &timeout);
+		vm_->setActiveCalibration (index, adc, voltage);
+	}
 }
 
 /************************************************************************/
@@ -803,11 +813,33 @@ void Driver::thread (void)
 			last_sent_at = timer.get();
 		}
 
+		if (_rec)
+		{
+			uint16_t size;
+			recSize(&size, &timeout);
+
+			poll (&size);
+		}
+
 		/********************************************************
 		* Prevents 100% CPU utilization,
 		* in case the operation is taking longer than 100ms.
 		* *******************************************************/
 		timer.sleep (10e-3);
+	}
+}
+
+/************************************************************************/
+
+void Driver::poll (uint16_t *size)
+{
+	uint16_t dataSize = 64;
+	float timeout = 1;
+
+	while (size > 0)
+	{
+		recData (&dataSize, &timeout); // Stores the data in _dataq_32
+		size = size - dataSize;
 	}
 }
 
@@ -1491,16 +1523,18 @@ std::vector<float> Driver::getData (void)
  * Output : std::vector<float>
  */
 {
-	std::vector<float> data;
+	std::vector<float> data {1.0, 3.5, 5.1, 7.2};
 
-	std::lock_guard<std::mutex> lock(_dataq_lock);
-
-	while (!_dataq.empty())
-	{
-		data.push_back(_dataq.front());
-		_dataq.pop();
-		_dataq_32.pop();
-	}
+//	std::vector<float> data;
+//
+// 	std::lock_guard<std::mutex> lock(_dataq_lock);
+//
+// 	while (!_dataq.empty())
+// 	{
+// 		data.push_back(_dataq.front());
+// 		_dataq.pop();
+// 		_dataq_32.pop();
+// 	}
 
 	return data;
 }
@@ -1551,11 +1585,12 @@ void Driver::StopRec (float *timeout)
 
 float Driver::applyCalibration (int32_t adc_value)
 /*
- * Applys the calibration table (depending upon what physical quantity is
- * being measured, and the range for the same; eg. current, 100uA range)
- * to convert an ADC value into a voltage or current value
+ * Applys the calibration (depending upon what physical quantity is being
+ * measured, and the range for the same; eg. current, 100uA range) to
+ * convert an ADC value into a voltage or current value
  */
 {
+	//TODO : How to apply calibration from a table?
 	return float (adc_value);
 }
 

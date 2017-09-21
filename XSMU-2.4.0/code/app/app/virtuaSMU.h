@@ -64,6 +64,7 @@ class Driver {
 
 	void keepAlive (uint32_t* lease_time_ms, float* timeout);
 	void thread (void);
+	void poll (uint16_t* size);
 
 	void setSourceMode (SourceMode* mode, float* timeout);
 

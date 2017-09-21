@@ -1,6 +1,8 @@
 #ifndef __XSMU__
 #define __XSMU__
 
+#include <vector>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -270,7 +272,7 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
  *
  */
 
-//void getData (int deviceID, std::vector<float> *ret_data);
+std::vector<float> getData (int deviceID);
 
 /************************************************************************/
 /**

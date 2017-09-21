@@ -873,16 +873,16 @@ void changeBaud (int deviceID, unsigned int baudRate, float timeout,
 
 /************************************************************************/
 
-// void getData (int deviceID, std::vector<float> *ret_data)
-// {
-// 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
-//
-// 	std::vector<float> data_;
-//
-// 	data_ = virtuaSMU->getData();
-//
-// 	*ret_data = data_;
-// }
+std::vector<float> getData (int deviceID)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	std::vector<float> data_ = virtuaSMU->getData();
+
+	return data_;
+}
+
+/************************************************************************/
 
 void StartRec (int deviceID, float timeout,
 				float *ret_timeout)
