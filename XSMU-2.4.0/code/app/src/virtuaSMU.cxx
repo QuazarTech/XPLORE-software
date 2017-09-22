@@ -684,6 +684,8 @@ void Driver::open (const char* serialNo, float* timeout)
 		 << BUGFIX_VERSION_NO (versionInfo_->firmware_version())
 		 << std::endl;
 
+	_alive = true;
+	_rec = false;
 	_thread_future = std::async (std::launch::async, &Driver::thread, this);
 	PRINT_DEBUG ("Async thread launched")
 }
@@ -818,6 +820,7 @@ void Driver::thread (void)
 			uint16_t size;
 			recSize(&size, &timeout);
 
+			PRINT_DEBUG ("Recieved RecSize = " << size)
 			poll (&size);
 		}
 
@@ -836,10 +839,11 @@ void Driver::poll (uint16_t *size)
 	uint16_t dataSize = 64;
 	float timeout = 1;
 
-	while (size > 0)
+	while (*size > 0)
 	{
+		PRINT_DEBUG ("Size of data : " << *size)
 		recData (&dataSize, &timeout); // Stores the data in _dataq_32
-		size = size - dataSize;
+		*size -= dataSize;
 	}
 }
 
@@ -1029,7 +1033,6 @@ void Driver::VS_saveCalibration (float* timeout)
 void Driver::VS_setVoltage (float* voltage, float* timeout)
 {
 	auto unique_lock = comm_->lock();
-	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_VS_SET_VOLTAGE);
 	comm_->transmit_VS_setVoltage (*voltage);
@@ -1176,9 +1179,7 @@ void Driver::VM_saveCalibration (float* timeout)
 void Driver::VM_read (uint16_t* filterLength, float* voltage,
 						float* timeout)
 {
-	PRINT_DEBUG ("Trying to Acquire Lock")
 	auto unique_lock = comm_->lock();
-	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_VM_READ);
 	comm_->transmit_VM_read (*filterLength);
@@ -1463,7 +1464,6 @@ void Driver::changeBaud (uint32_t* baudRate, float* timeout)
  */
 {
 	auto unique_lock = comm_->lock();
-	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_CHANGE_BAUD);
 
@@ -1483,7 +1483,6 @@ void Driver::recSize (uint16_t* recSize, float* timeout)
  */
 {
 	auto unique_lock = comm_->lock();
-	PRINT_DEBUG ("Lock Acquired")
 
 	ackBits_.reset (COMM_CBCODE_REC_SIZE);
 
@@ -1502,6 +1501,7 @@ void Driver::recData (uint16_t* size, float* timeout)
  * within timeout duration.
  */
 {
+	PRINT_DEBUG ("Trying to acquire lock")
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
@@ -1523,18 +1523,18 @@ std::vector<float> Driver::getData (void)
  * Output : std::vector<float>
  */
 {
-	std::vector<float> data {1.0, 3.5, 5.1, 7.2};
+	//std::vector<float> data {1.0, 3.5, 5.1, 7.2};
 
-//	std::vector<float> data;
-//
-// 	std::lock_guard<std::mutex> lock(_dataq_lock);
-//
-// 	while (!_dataq.empty())
-// 	{
-// 		data.push_back(_dataq.front());
-// 		_dataq.pop();
-// 		_dataq_32.pop();
-// 	}
+	std::vector<float> data;
+
+	std::lock_guard<std::mutex> lock(_dataq_lock);
+
+	while (!_dataq.empty())
+	{
+		data.push_back(_dataq.front());
+		_dataq.pop();
+		_dataq_32.pop();
+	}
 
 	return data;
 }
@@ -1548,8 +1548,6 @@ void Driver::StartRec (float *timeout)
  * start streaming data from the ADC
  */
 {
-	_rec = true;
-
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
@@ -1558,7 +1556,8 @@ void Driver::StartRec (float *timeout)
 	comm_->transmit_StartRec();
 	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 
-	waitForResponse (COMM_CBCODE_START_REC, timeout);
+	if (waitForResponse (COMM_CBCODE_START_REC, timeout))
+		_rec = true;
 }
 
 void Driver::StopRec (float *timeout)
@@ -1568,7 +1567,7 @@ void Driver::StopRec (float *timeout)
  * from the ADC
  */
 {
-	_rec = false;
+		_rec = false;
 
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
