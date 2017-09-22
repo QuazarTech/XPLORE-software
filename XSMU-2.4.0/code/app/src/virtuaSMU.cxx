@@ -612,7 +612,6 @@ void Driver::recSizeCB (const CommCB* oCB)
 	reinterpret_cast<const CommCB_recSize*> (oCB);
 
 	recSize_ =  o->recSize();
-
 	ackBits_.set (COMM_CBCODE_REC_SIZE);
 }
 
@@ -647,6 +646,9 @@ void Driver::recDataCB (const CommCB* oCB)
 void Driver::StartRecCB (const CommCB* oCB)
 {
 	ackBits_.set (COMM_CBCODE_START_REC);
+	Timer timer;
+	_poll_stream_at = timer.get();
+	_rec = true;
 }
 
 void Driver::StopRecCB (const CommCB* oCB)
@@ -815,13 +817,11 @@ void Driver::thread (void)
 			last_sent_at = timer.get();
 		}
 
-		if (_rec)
+		if (_rec && timer.get() >= _poll_stream_at)
 		{
-			uint16_t size;
-			recSize(&size, &timeout);
+			poll_stream();
 
-			PRINT_DEBUG ("Recieved RecSize = " << size)
-			poll (&size);
+			_poll_stream_at = timer.get() + _poll_stream_interval;
 		}
 
 		/********************************************************
@@ -834,17 +834,25 @@ void Driver::thread (void)
 
 /************************************************************************/
 
-void Driver::poll (uint16_t *size)
+void Driver::poll_stream (void)
 {
-	uint16_t dataSize = 64;
-	float timeout = 1;
+	uint16_t size;
 
-	while (*size > 0)
-	{
-		PRINT_DEBUG ("Size of data : " << *size)
-		recData (&dataSize, &timeout); // Stores the data in _dataq_32
-		*size -= dataSize;
-	}
+	float timeout = 1;
+	recSize (&size, &timeout);
+
+	if (size) do {
+
+		PRINT_DEBUG ("Size of data : " << size);
+
+		uint16_t rx_size = size;
+
+		float timeout = 1;
+		recData (&rx_size, &timeout); // Stores the data in _dataq_32
+
+		size -= rx_size;
+
+	} while (size);
 }
 
 /************************************************************************/
@@ -1556,8 +1564,7 @@ void Driver::StartRec (float *timeout)
 	comm_->transmit_StartRec();
 	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 
-	if (waitForResponse (COMM_CBCODE_START_REC, timeout))
-		_rec = true;
+	waitForResponse (COMM_CBCODE_START_REC, timeout);
 }
 
 void Driver::StopRec (float *timeout)
@@ -1567,8 +1574,6 @@ void Driver::StopRec (float *timeout)
  * from the ADC
  */
 {
-		_rec = false;
-
 	auto unique_lock = comm_->lock();
 	PRINT_DEBUG ("Lock Acquired")
 
@@ -1578,6 +1583,7 @@ void Driver::StopRec (float *timeout)
 	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 
 	waitForResponse (COMM_CBCODE_STOP_REC, timeout);
+	_rec = false;
 }
 
 /************************************************************************/

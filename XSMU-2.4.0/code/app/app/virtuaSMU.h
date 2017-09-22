@@ -64,7 +64,7 @@ class Driver {
 
 	void keepAlive (uint32_t* lease_time_ms, float* timeout);
 	void thread (void);
-	void poll (uint16_t* size);
+	void poll_stream (void);
 
 	void setSourceMode (SourceMode* mode, float* timeout);
 
@@ -286,6 +286,8 @@ public:
 
 private:
 	bool _rec;
+	double _poll_stream_at = 100e-3;
+	double _poll_stream_interval;
 
 private:
 	float applyCalibration (int32_t adc_value);
