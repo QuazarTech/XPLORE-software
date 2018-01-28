@@ -955,7 +955,7 @@ void recData (int deviceID, short unsigned int size, float timeout,
 
 	virtuaSMU->recData (&size_, &timeout_);
 
-	*ret_size = 0;
+    *ret_size = 0;
 
 	if ((*ret_timeout = timeout_) == 0)
         return;

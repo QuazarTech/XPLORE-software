@@ -40,6 +40,8 @@ std::vector <FTDI_DeviceInfo> Driver::scan (void)
 	for (it = allDevices.begin(); it != allDevices.end(); ++it)
 		if (std::string (it->description()) == "XPLORE SMU")
 			device_list.push_back (*it);
+        else
+            std::cout << "Found: " << it->description() << std::endl;
 
 		return device_list;
 }
@@ -384,21 +386,11 @@ void Driver::CM_readCB (const CommCB* oCB)
 
 void Driver::VM_setRangeCB (const CommCB* oCB)
 {
-	const CommCB_VM_SetRange* o =
-	reinterpret_cast<const CommCB_VM_SetRange*> (oCB);
+    const CommCB_VM_GetCalibration* o =
+	reinterpret_cast<const CommCB_VM_GetCalibration*> (oCB);
 
-	vm_->setRange (toVM_Range (o->range()));
-	ackBits_.set (COMM_CBCODE_VM_SET_RANGE);
-
-	//TODO : How do I replace the number 5 here?
-	for (uint16_t index = 0; index < 5; ++index)
-	{
-		int32_t adc;
-		float voltage;
-		float timeout = 1;
-		VM_getCalibration (&index, &adc, &voltage, &timeout);
-		vm_->setActiveCalibration (index, adc, voltage);
-	}
+	vm_->setCalibration (o->index(), o->adc(), o->voltage());
+	ackBits_.set (COMM_CBCODE_VM_GET_CALIBRATION);
 }
 
 /************************************************************************/
@@ -619,12 +611,11 @@ void Driver::recSizeCB (const CommCB* oCB)
 
 void Driver::recDataCB (const CommCB* oCB)
 {
-	PRINT_DEBUG ("CB started")
-
 	const CommCB_recData* o =
 	reinterpret_cast<const CommCB_recData*> (oCB);
 
 	uint16_t size = o->size(); //Size of data sent in this packet
+    PRINT_DEBUG ("***********recSize in CB : " << size)
 	std::vector<int32_t> data = o->recData(); //Data in this packet
 
 	PRINT_DEBUG ("Trying to acquire dataq lock")
@@ -633,6 +624,7 @@ void Driver::recDataCB (const CommCB* oCB)
 	for (uint16_t i = 0; i < size; ++i)
 	{
 		_dataq_32.push (data[i]);
+        PRINT_DEBUG ("***********recData in CB : " << data[i])
 		_dataq.push (applyCalibration (data[i]));
 	}
 
@@ -649,6 +641,14 @@ void Driver::StartRecCB (const CommCB* oCB)
 	Timer timer;
 	_poll_stream_at = timer.get();
 	_rec = true;
+
+	/*
+	 * Change Baud Rate of communication when streaming starts
+	 */
+
+	// uint32_t baudRate = 9600;
+	// float timeout = 1;
+	// changeBaud (&baudRate, &timeout);
 }
 
 void Driver::StopRecCB (const CommCB* oCB)
@@ -697,7 +697,17 @@ void Driver::close (void)
 	try {
 		PRINT_DEBUG ("Closing Device")
 		_alive = false;
-		_thread_future.get();
+		if (_thread_future.valid())
+            _thread_future.get();
+	}
+	catch (...)
+	{}
+
+	try
+	{
+		float timeout = 1;
+		uint32_t lease_time_ms = 0;
+		keepAlive (&lease_time_ms, &timeout);
 	}
 	catch (...)
 	{}
@@ -775,10 +785,9 @@ void Driver::identify (float* timeout)
 {
 	identity_.clear();
 	versionInfo_->clear();
+    ackBits_.reset (COMM_CBCODE_IDN);
 
-	ackBits_.reset (COMM_CBCODE_IDN);
 	comm_->transmitIdentify();
-
 	waitForResponse (COMM_CBCODE_IDN, timeout);
 }
 
@@ -817,7 +826,8 @@ void Driver::thread (void)
 			last_sent_at = timer.get();
 		}
 
-		if (_rec && timer.get() >= _poll_stream_at)
+
+        if (_rec && timer.get() >= _poll_stream_at)
 		{
 			poll_stream();
 
@@ -841,14 +851,16 @@ void Driver::poll_stream (void)
 	float timeout = 1;
 	recSize (&size, &timeout);
 
-	if (size) do {
+    PRINT_DEBUG ("*****************Size of data : " << size);
 
-		PRINT_DEBUG ("Size of data : " << size);
+	if (size) do {
 
 		uint16_t rx_size = size;
 
-		float timeout = 1;
+		float timeout = 10;
 		recData (&rx_size, &timeout); // Stores the data in _dataq_32
+
+        PRINT_DEBUG (">>>>>>>>>>>>>>>>>>Size of rx data : " << rx_size);
 
 		size -= rx_size;
 
@@ -1565,6 +1577,7 @@ void Driver::StartRec (float *timeout)
 	PRINT_DEBUG ("Successfully transmitted, waiting for response")
 
 	waitForResponse (COMM_CBCODE_START_REC, timeout);
+    PRINT_DEBUG ("Response Recieved")
 }
 
 void Driver::StopRec (float *timeout)
@@ -1584,6 +1597,15 @@ void Driver::StopRec (float *timeout)
 
 	waitForResponse (COMM_CBCODE_STOP_REC, timeout);
 	_rec = false;
+    PRINT_DEBUG ("Response Recieved")
+
+	/*
+	 * Restore Baud Rate of communication when streaming stops
+	 */
+
+	// uint32_t baudRate = 9600;
+	// float time_out = 1;
+	// changeBaud (&baudRate, &time_out);
 }
 
 /************************************************************************/

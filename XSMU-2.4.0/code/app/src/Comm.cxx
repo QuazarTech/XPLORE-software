@@ -169,7 +169,7 @@ void Comm::processReceivedData (const void* data, uint16_t size)
 
 	if (size) do {
 
-		std::printf ("%X %c\n", static_cast<unsigned> (*src), *src);
+		//std::printf ("%X %c\n", static_cast<unsigned> (*src), *src);
 		qp4_->receiver().push_back (*src++);
 
 		if (qp4_->receiver().ready()) {

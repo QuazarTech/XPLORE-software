@@ -1,4 +1,5 @@
 import libxsmu, time, math, sys
+from time import sleep
 
 ##########################################################################
 # Scans USB bus for Xplore SMU.
@@ -30,18 +31,19 @@ if (timeout == 0.0) or (not goodID):
 
 ##########################################################################
 # Sends Keep_Alive Packet to device
+for index in range (3):
+    timeout       = 5.0
+    lease_time_ms = 10000
 
-timeout       = 5.0
-lease_time_ms = 10000
+    lease_time_ms, timeout = libxsmu.keepAlive (deviceID, lease_time_ms, timeout)
+    print \
+        "Lease Time: ", lease_time_ms, "\n" \
+        "Timeout: ", timeout
 
-lease_time_ms, timeout = libxsmu.keepAlive (deviceID, lease_time_ms, timeout)
-print \
-	"Lease Time: ", lease_time_ms, "\n" \
-	"Timeout: ", timeout
-
-if (timeout == 0.0):
-	print 'Communication timeout in keepAlive'
-	exit (-2)
+    if (timeout == 0.0):
+        print 'Communication timeout in keepAlive'
+        exit (-2)
+    sleep (5)
 
 ##########################################################################
 # closes the device.

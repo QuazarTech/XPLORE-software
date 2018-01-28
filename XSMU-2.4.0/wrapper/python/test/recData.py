@@ -35,7 +35,7 @@ sleep (5)
 # Queries the data stored in standby data queue in SMU
 
 timeout = 10.0
-size = 1
+size = 2
 
 recSize, timeout = libxsmu.recData (deviceID, size, timeout)
 print \

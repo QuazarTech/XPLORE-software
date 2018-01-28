@@ -287,7 +287,7 @@ public:
 private:
 	bool _rec;
 	double _poll_stream_at = 100e-3;
-	double _poll_stream_interval;
+	static constexpr double _poll_stream_interval = 1000e-3;
 
 private:
 	float applyCalibration (int32_t adc_value);

@@ -1639,7 +1639,7 @@ public:
 
 private:
 	uint16_t recSize_;
-	uint16_t recData_;
+    uint16_t reserve_;
 };
 
 /************************************************************************/
