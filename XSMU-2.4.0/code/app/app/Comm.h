@@ -1675,7 +1675,7 @@ public:
 
 	int32_t recData (uint16_t idx) const
 	{
-		return smu::ntoh(recData_[idx]);
+        return smu::ntoh(recData_[idx]);
 	}
 
 private:

@@ -624,7 +624,6 @@ void Driver::recDataCB (const CommCB* oCB)
 	for (uint16_t i = 0; i < size; ++i)
 	{
 		_dataq_32.push (data[i]);
-        PRINT_DEBUG ("***********recData in CB : " << data[i])
 		_dataq.push (applyCalibration (data[i]));
 	}
 

@@ -787,7 +787,7 @@ void Comm::recSizeCB (const void* data, uint16_t size)
 
 void Comm::recDataCB (const void* data, uint16_t size)
 {
-	PRINT_DEBUG ("Size : " << size << "Expected : " << sizeof(CommRequest_recData))
+	PRINT_DEBUG ("Size : " << size << "Expected : " << sizeof(CommResponse_recData))
 
 	if (size < sizeof (CommResponse_recData))
 	{
@@ -802,11 +802,12 @@ void Comm::recDataCB (const void* data, uint16_t size)
 
 	//Construct a std::vector<int32_t> from the recieved data array
 	uint16_t n = res->size();
-	std::vector<int32_t> recData (n);
+	std::vector<int32_t> recData;
 
 	for (uint16_t i = 0; i < n; ++i)
 	{
 		recData.push_back (res->recData(i));
+		std::cout << "Data pushed: " << recData[i] << std::endl;
 	}
 
 	PRINT_DEBUG ("VECTOR CONSTRUCTED")
