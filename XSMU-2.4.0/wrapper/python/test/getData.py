@@ -30,6 +30,16 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
+# Start recording streamed data from the XSMU
+
+timeout = 5
+timeout = libxsmu.StartRec (deviceID, timeout)
+print \
+	"Started Recording Streamed Data"
+
+sleep (5)
+
+##########################################################################
 # Get streamed data from data queue
 
 print \
@@ -39,14 +49,14 @@ logfile = open ('log.txt', 'w')
 
 t0 = time.time()
 _time_ = 0
-while (time.time() - t0 < 60):
-	print "Remaining time: ", 60 - (time.time() - t0), " seconds"
+while (time.time() - t0 < 60*60):
+	print "Remaining time: ", 60 - (time.time() - t0) / 60.0, " minutes" 
 	timeout = 5.0
 	recSize, timeout = libxsmu.recSize (deviceID, timeout)
 	data = libxsmu.getData (deviceID)
 	for voltage in data:
 		logfile.write (str (_time_) + ", " + str (voltage) + '\n')
-		print _time_, ',\t', voltage * 1e9, ' nV'
+		print _time_, ',\t', voltage * 1e9, ' ADC'
 		logfile.flush()
 		_time_ = _time_ + 0.1
 	time.sleep (10)
