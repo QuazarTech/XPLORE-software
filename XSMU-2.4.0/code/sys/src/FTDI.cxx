@@ -11,7 +11,7 @@
 #endif
 
 namespace smu {
-	
+
 /************************************************************************/
 /************************************************************************/
 
@@ -237,6 +237,47 @@ void FTDI::close (void)
 bool FTDI::good (void) const
 {
 	return handle_;
+}
+
+void FTDI::setBaudRate (uint32_t bd)
+{
+	switch (bd)
+	{
+		case 9600:
+			return _setBaudrate (9600);
+
+
+		case 19200:
+			return _setBaudrate (19200);
+
+
+		case 38400:
+			return _setBaudrate (38400);
+
+
+		case 57600:
+			return _setBaudrate (57600);
+
+
+		case 115200:
+			return _setBaudrate (115200);
+	}
+}
+
+void FTDI::_setBaudrate (uint32_t baudrate)
+{
+	if (ftdi_set_baudrate (handle_, baudrate) != FTDI_OK) {
+
+		close();
+		return;
+	}
+
+	if (ftdi_set_line_property2 (handle_, BITS_8,
+		STOP_BIT_1, NONE, BREAK_OFF) != FTDI_OK) {
+
+		close();
+		return;
+	}
 }
 
 /************************************************************************/

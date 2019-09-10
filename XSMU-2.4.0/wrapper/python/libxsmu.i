@@ -1,8 +1,15 @@
 %module libxsmu
 %include "typemaps.i"
+%include "std_vector.i"
+%include "stdint.i"
 %{
 #include "libxsmu.h"
 %}
+
+namespace std
+{
+  %template(FloatVector) vector<float>;
+}
 
 %{
 
@@ -205,9 +212,31 @@ extern void VM_getTerminal(int deviceID,
 
 /**************************************************************/
 
-%}
+extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+						unsigned int *ret_baudRate, float *ret_timeout);
+
+extern void keepAlive (int deviceID, unsigned int lease_time_ms,
+						float timeout, unsigned int *ret_lease_time_ms,
+						float *ret_timeout);
+
+extern std::vector<float> getData (int deviceID);
+
+extern void StartRec (int deviceID, float timeout,
+						float *ret_timeout);
+
+extern void StopRec (int deviceID, float timeout,
+						float *ret_timeout);
+
+extern void recSize (int deviceID, float timeout,
+						short unsigned int *ret_recSize, float *ret_timeout);
+
+extern void recData (int deviceID, short unsigned int size, float timeout,
+						short unsigned int *ret_size, float *ret_timeout);
 
 /**************************************************************/
+
+%}
+
 /**************************************************************/
 /**************************************************************/
 
@@ -380,5 +409,26 @@ extern void VM_getTerminal(int deviceID, float timeout,
 						unsigned int *OUTPUT, float *OUTPUT);
 
 /**************************************************************/
-/**************************************************************/
 
+extern void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+						  unsigned int *OUTPUT, float *OUTPUT);
+
+extern void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
+							unsigned int *OUTPUT, float *OUTPUT);
+
+extern std::vector<float> getData (int deviceID);
+
+extern void StartRec (int deviceID, float timeout,
+							float *OUTPUT);
+
+extern void StopRec (int deviceID, float timeout,
+							float *OUTPUT);
+
+extern void recSize (int deviceID, float timeout,
+							short unsigned int *OUTPUT, float *OUTPUT);
+
+extern void recData (int deviceID, short unsigned int size, float timeout,
+							short unsigned int *OUTPUT, float *OUTPUT);
+
+/**************************************************************/
+/**************************************************************/

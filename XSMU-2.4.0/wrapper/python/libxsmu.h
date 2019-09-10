@@ -1,22 +1,26 @@
 #ifndef __XSMU__
 #define __XSMU__
 
+#include <vector>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * \brief Scans USB bus for XPLORE lock-in amplifier.
+ * \brief Scans USB bus for XPLORE Source-Meter Unit.
  *
- * \return Number of XPLORE lock-in amplifier found.
+ * \return Number of XPLORE Source-Meter Unit found.
  *
  * This function must be called first. It creates an internal
- * list of XPLORE lock-in amplifier hardware, whose details,
+ * list of XPLORE Source-Meter Unit hardware, whose details,
  * e.g. serial number etc., can then be accessed by other functions,
  * e.g. \ref serialNo.
  *
  */
 int scan(void);
+
+/************************************************************************/
 
 /**
  * \brief Returns the serial number of a previously scanned device.
@@ -35,7 +39,7 @@ int scan(void);
  */
 const char *serialNo(int i);
 
-/**************************************************************/
+/************************************************************************/
 
 /**
  * \brief Opens a previously scanned device for communication,
@@ -60,6 +64,8 @@ int open_device(const char *serialNo,
 				float timeout,
 				unsigned int *ret_goodID, float *ret_timeout);
 
+/************************************************************************/
+
 /**
  * \brief Closes a previously opened device.
  *
@@ -67,14 +73,14 @@ int open_device(const char *serialNo,
  */
 void close_device(int deviceID);
 
-/**************************************************************/
+/************************************************************************/
 
 void setSourceMode(int deviceID,
 				   int mode,
 				   float timeout,
 				   unsigned int *ret_mode, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void CS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -102,7 +108,7 @@ void CS_setCurrent(int deviceID, float current, float timeout,
 void CS_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void VS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -130,7 +136,7 @@ void VS_setVoltage(int deviceID, float voltage, float timeout,
 void VS_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void CM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -154,7 +160,7 @@ void CM_getReading(int deviceID, unsigned int filterLength,
 void CM_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void VM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -178,13 +184,13 @@ void VM_getReading(int deviceID, unsigned int filterLength,
 void VM_loadDefaultCalibration (int deviceID,
 								float timeout, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void RM_getReadingAutoscale (int deviceID, unsigned int filterLength,
 							 float timeout, float *ret_resistance,
 							 float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void SystemConfig_Save (int deviceID,
 						float timeout,
@@ -201,7 +207,7 @@ void SystemConfig_Set_hardwareVersion (int deviceID,
 					unsigned int hardwareVersion, float timeout,
 					unsigned int* ret_hardwareVersion, float* ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
 
 void library_version  (int deviceID, unsigned int* version);
 void hardware_version (int deviceID, unsigned int* version);
@@ -214,7 +220,7 @@ unsigned int major_version_no (unsigned int version);
 unsigned int minor_version_no (unsigned int version);
 unsigned int bugfix_version_no (unsigned int version);
 
-/**************************************************************/
+/************************************************************************/
 
 void VM2_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout);
@@ -244,8 +250,90 @@ void VM_setTerminal(int deviceID, int terminal, float timeout,
 void VM_getTerminal(int deviceID, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout);
 
-/**************************************************************/
+/************************************************************************/
+/**
+ * \brief Changes the Baud Rate of communication between the computer and the SMU.
+ *
+ * \return Current Baud Rate of communcation if a valid Baud Rate was provided.
+ * Otherwise, a NoOperation() exception is thrown.
+ *
+ */
 
+void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+				unsigned int *ret_baudRate, float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Gets data streamed from the SMU.
+ *
+ * \return C++ Vector containing streamed data from the SMU as float type
+ *
+ * This function will only return non-zero data when the \ref startRec function has been called, that starts streaming data from the SMU.
+ *
+ */
+
+std::vector<float> getData (int deviceID);
+
+/************************************************************************/
+/**
+ * \brief Starts recording streamed data from the SMU
+ *
+ * \return None
+ *
+ * This function sets a flag in the driver, to start recording streamed data from the SMU.
+ */
+
+void StartRec (int deviceID, float timeout,
+			float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Stops recording streamed data from the SMU
+ *
+ * \return None
+ *
+ * This function unsets a flag in the driver, to stop recording streamed data from the SMU.
+ */
+
+void StopRec (int deviceID, float timeout,
+			float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Sends a KEEP_ALIVE packet to the SMU, asking the SMU to communcate as usual
+ * for the next \ref lease_time_ms milliseconds
+ *
+ * \return The duration for which the SMU has been asked to keep alive.
+ *
+ */
+
+void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
+				unsigned int *ret_lease_time_ms, float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Queries the number of datapoints in the standby data queue in the SMU
+ *
+ * \return Number of datapoints in the standby data queue in the SMU
+ *
+ */
+
+void recSize (int deviceID, float timeout,
+			  short unsigned int *ret_recSize, float *ret_timeout);
+
+/************************************************************************/
+/**
+ * \brief Queries the data in the standby data queue in the SMU
+ *
+ * \return Number of datapoints being transmitted by the SMU
+ *
+ */
+
+void recData (int deviceID, short unsigned int size, float timeout,
+				short unsigned int *ret_size, float *ret_timeout);
+
+/************************************************************************/
+/************************************************************************/
 #ifdef __cplusplus
 }				// extern "C"
 

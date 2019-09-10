@@ -13,6 +13,9 @@
 
 #include <bitset>
 #include <stdint.h>
+#include <future>
+#include <mutex>
+#include <queue>
 
 namespace smu {
 
@@ -58,7 +61,10 @@ class Driver {
 	/***************************************************/
 
 	void identify (float* timeout);
-	void sync (float* timeout);
+
+	void keepAlive (uint32_t* lease_time_ms, float* timeout);
+	void thread (void);
+	void poll_stream (void);
 
 	void setSourceMode (SourceMode* mode, float* timeout);
 
@@ -166,6 +172,14 @@ class Driver {
 
 	/***************************************************/
 
+	void changeBaud (uint32_t* baudRate, float* timeout);
+
+	void recSize  (uint16_t* recSize, float* timeout);
+	void recData  (uint16_t* size, float* timeout);
+	void StartRec (float* timeout);
+	void StopRec  (float* timeout);
+
+	/***************************************************/
  public:
 	bool goodID (void) const;
 	const char* identity (void) const {
@@ -181,7 +195,7 @@ class Driver {
 
 	void nopCB (const CommCB* oCB);
 	void identityCB (const CommCB* oCB);
-	void syncCB (const CommCB* oCB);
+	void keepAliveCB (const CommCB* oCB);
 
 	void setSourceModeCB (const CommCB* oCB);
 
@@ -233,6 +247,12 @@ class Driver {
 	void VM_setTerminalCB (const CommCB* oCB);
 	void VM_getTerminalCB (const CommCB* oCB);
 
+	void changeBaudCB (const CommCB* oCB);
+	void recSizeCB (const CommCB* oCB);
+	void recDataCB (const CommCB* oCB);
+	void StartRecCB (const CommCB* oCB);
+	void StopRecCB (const CommCB* oCB);
+
  private:
 	Comm* comm_;
 	CS* cs_;
@@ -245,12 +265,38 @@ class Driver {
 	VersionInfo* versionInfo_;
 	AckBits ackBits_;
 	std::string identity_;
+
+private:
+	uint32_t baudRate_;
+	bool _alive;
+	std::future<void> _thread_future;
+
+private:
+
+	uint16_t recSize_;             //Stores size of available data with FW
+	std::queue<int32_t> _dataq_32; //Stores ADC data obtained from FW
+
+	//Stores ADC data converted to float using calibration table
+	std::queue<float> _dataq;
+
+	std::mutex _dataq_lock;
+
+public:
+	std::vector<float> getData (void);
+
+private:
+	bool _rec;
+	double _poll_stream_at = 100e-3;
+	static constexpr double _poll_stream_interval = 1000e-3;
+
+private:
+	float applyCalibration (int32_t adc_value);
 };
 
 /************************************************************************/
 /************************************************************************/
 
-} // namespae smu
+} // namespace smu
 
 typedef smu::Driver VirtuaSMU;
 

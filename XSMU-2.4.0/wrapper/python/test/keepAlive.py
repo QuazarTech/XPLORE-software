@@ -1,4 +1,4 @@
-import libxsmu, time, math
+import libxsmu, time, math, sys
 from time import sleep
 
 ##########################################################################
@@ -30,25 +30,20 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
-# Selects source range to 1mA
+# Sends Keep_Alive Packet to device
+for index in range (3):
+    timeout       = 5.0
+    lease_time_ms = 10000
 
-logfile = open ('log.txt', 'w')
+    lease_time_ms, timeout = libxsmu.keepAlive (deviceID, lease_time_ms, timeout)
+    print \
+        "Lease Time: ", lease_time_ms, "\n" \
+        "Timeout: ", timeout
 
-for n in range (0, 100):
-	filter_length = 32
-	timeout = 1 + 0.03 * filter_length
-	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
-	print \
-		"voltage               :", voltage, "\n" \
-		"Remaining time        :", timeout, "sec", "\n"
-
-	logfile.write (str (voltage) + '\n')
-	logfile.flush()
-	#sleep (1)
-
-if (timeout == 0.0):
-	print 'Communication timeout in VM_getReading.'
-	exit (-2)
+    if (timeout == 0.0):
+        print 'Communication timeout in keepAlive'
+        exit (-2)
+    sleep (5)
 
 ##########################################################################
 # closes the device.

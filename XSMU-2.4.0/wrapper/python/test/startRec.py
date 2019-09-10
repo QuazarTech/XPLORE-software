@@ -1,4 +1,4 @@
-import libxsmu, time, math
+import libxsmu, time, math, sys
 from time import sleep
 
 ##########################################################################
@@ -29,28 +29,27 @@ if (timeout == 0.0) or (not goodID):
 	print 'Communication timeout in open_device.'
 	exit (-2)
 
+sleep (5)
+
 ##########################################################################
-# Selects source range to 1mA
+# Start recording streamed data from the SMU
 
-logfile = open ('log.txt', 'w')
+timeout = 5.0
+print \
+	"Starting Recording Streamed Data"
+timeout = libxsmu.StartRec (deviceID, timeout)
+print \
+	"Started Recording Streamed Data"
 
-for n in range (0, 100):
-	filter_length = 32
-	timeout = 1 + 0.03 * filter_length
-	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
-	print \
-		"voltage               :", voltage, "\n" \
-		"Remaining time        :", timeout, "sec", "\n"
+sleep(20)
 
-	logfile.write (str (voltage) + '\n')
-	logfile.flush()
-	#sleep (1)
-
-if (timeout == 0.0):
-	print 'Communication timeout in VM_getReading.'
-	exit (-2)
+timeout = 5.0
+timeout = libxsmu.StopRec (deviceID, timeout)
+print \
+	"Stopped Recording Streamed Data"
 
 ##########################################################################
 # closes the device.
 
+sleep(5)
 libxsmu.close_device(deviceID)

@@ -1,4 +1,4 @@
-import libxsmu, time, math
+import libxsmu, time, math, sys
 from time import sleep
 
 ##########################################################################
@@ -30,24 +30,18 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
-# Selects source range to 1mA
+# Set Baud Rate of communication
 
-logfile = open ('log.txt', 'w')
+timeout = 5.0
+baudRate = 9600
 
-for n in range (0, 100):
-	filter_length = 32
-	timeout = 1 + 0.03 * filter_length
-	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
-	print \
-		"voltage               :", voltage, "\n" \
-		"Remaining time        :", timeout, "sec", "\n"
-
-	logfile.write (str (voltage) + '\n')
-	logfile.flush()
-	#sleep (1)
+baudRate, timeout = libxsmu.changeBaud (deviceID, baudRate, timeout)
+print \
+	"Baud Rate: ", baudRate, "\n" \
+	"Timeout: ", timeout
 
 if (timeout == 0.0):
-	print 'Communication timeout in VM_getReading.'
+	print 'Communication timeout in changeBaud'
 	exit (-2)
 
 ##########################################################################

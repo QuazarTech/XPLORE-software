@@ -50,7 +50,7 @@ int open_device(const char *serialNo,
 	return it - virtuaSMUs.begin();
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void close_device(int deviceID)
 {
@@ -58,8 +58,8 @@ void close_device(int deviceID)
 	virtuaSMUs[deviceID] = 0;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void setSourceMode(int deviceID, int mode, float timeout,
 				   unsigned int *ret_mode, float *ret_timeout)
@@ -81,8 +81,8 @@ void setSourceMode(int deviceID, int mode, float timeout,
 	*ret_mode = (int) mode_;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void CS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout)
@@ -101,7 +101,7 @@ void CS_setRange(int deviceID, int range, float timeout,
 	*ret_range = range_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CS_getCalibration(int deviceID, unsigned int index, float timeout,
 					   unsigned int *ret_index, int *ret_dac,
@@ -127,7 +127,7 @@ void CS_getCalibration(int deviceID, unsigned int index, float timeout,
 	*ret_current = current_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CS_verifyCalibration(int deviceID, unsigned int index, float timeout,
 						  unsigned int *ret_index, int *ret_dac,
@@ -153,7 +153,7 @@ void CS_verifyCalibration(int deviceID, unsigned int index, float timeout,
 	*ret_current = current_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CS_setCalibration(int deviceID, unsigned int index, float current,
 					   float timeout, unsigned int *ret_index, int *ret_dac,
@@ -179,7 +179,7 @@ void CS_setCalibration(int deviceID, unsigned int index, float current,
 	*ret_current = current_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CS_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 {
@@ -188,7 +188,7 @@ void CS_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CS_setCurrent(int deviceID, float current, float timeout,
 				   float *ret_current, float *ret_timeout)
@@ -216,8 +216,8 @@ void CS_loadDefaultCalibration(int deviceID, float timeout,
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void VS_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout)
@@ -236,7 +236,7 @@ void VS_setRange(int deviceID, int range, float timeout,
 	*ret_range = range_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VS_getCalibration(int deviceID, unsigned int index, float timeout,
 					   unsigned int *ret_index, int *ret_dac,
@@ -262,7 +262,7 @@ void VS_getCalibration(int deviceID, unsigned int index, float timeout,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VS_verifyCalibration(int deviceID, unsigned int index, float timeout,
 						  unsigned int *ret_index, int *ret_dac,
@@ -288,7 +288,7 @@ void VS_verifyCalibration(int deviceID, unsigned int index, float timeout,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VS_setCalibration(int deviceID, unsigned int index, float voltage,
 					   float timeout, unsigned int *ret_index, int *ret_dac,
@@ -314,7 +314,7 @@ void VS_setCalibration(int deviceID, unsigned int index, float voltage,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VS_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 {
@@ -323,7 +323,7 @@ void VS_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VS_setVoltage(int deviceID, float voltage, float timeout,
 				   float *ret_voltage, float *ret_timeout)
@@ -351,8 +351,8 @@ void VS_loadDefaultCalibration(int deviceID, float timeout,
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void CM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout)
@@ -371,7 +371,7 @@ void CM_setRange(int deviceID, int range, float timeout,
 	*ret_range = range_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CM_getCalibration(int deviceID, unsigned int index, float timeout,
 					   unsigned int *ret_index, int *ret_adc,
@@ -397,7 +397,7 @@ void CM_getCalibration(int deviceID, unsigned int index, float timeout,
 	*ret_current = current_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CM_setCalibration(int deviceID, unsigned int index, float current,
 					   float timeout, unsigned int *ret_index, int *ret_adc,
@@ -423,7 +423,7 @@ void CM_setCalibration(int deviceID, unsigned int index, float current,
 	*ret_current = current_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CM_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 {
@@ -432,7 +432,7 @@ void CM_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void CM_getReading(int deviceID, unsigned int filterLength, float timeout,
 				   float *ret_current, float *ret_timeout)
@@ -461,8 +461,8 @@ void CM_loadDefaultCalibration(int deviceID, float timeout,
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void VM_setRange(int deviceID, int range, float timeout,
 				 unsigned int *ret_range, float *ret_timeout)
@@ -481,7 +481,7 @@ void VM_setRange(int deviceID, int range, float timeout,
 	*ret_range = range_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM_getCalibration(int deviceID, unsigned int index,
 					   float timeout,unsigned int *ret_index,
@@ -507,7 +507,7 @@ void VM_getCalibration(int deviceID, unsigned int index,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM_setCalibration(int deviceID, unsigned int index, float voltage,
 					   float timeout, unsigned int *ret_index, int *ret_adc,
@@ -533,7 +533,7 @@ void VM_setCalibration(int deviceID, unsigned int index, float voltage,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 {
@@ -542,7 +542,7 @@ void VM_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM_getReading(int deviceID, unsigned int filterLength, float timeout,
 				   float *ret_voltage, float *ret_timeout)
@@ -563,6 +563,8 @@ void VM_getReading(int deviceID, unsigned int filterLength, float timeout,
 	*ret_voltage = voltage_;
 }
 
+/************************************************************************/
+
 void VM_loadDefaultCalibration(int deviceID, float timeout,
 							   float *ret_timeout)
 {
@@ -571,8 +573,8 @@ void VM_loadDefaultCalibration(int deviceID, float timeout,
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void RM_getReadingAutoscale (int deviceID, unsigned int filterLength,
 							 float timeout, float *ret_resistance,
@@ -594,8 +596,8 @@ void RM_getReadingAutoscale (int deviceID, unsigned int filterLength,
 	*ret_resistance = resistance_;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void SystemConfig_Save (int deviceID, float timeout, float* ret_timeout)
 {
@@ -604,12 +606,16 @@ void SystemConfig_Save (int deviceID, float timeout, float* ret_timeout)
 	*ret_timeout = timeout;
 }
 
+/************************************************************************/
+
 void SystemConfig_LoadDefault (int deviceID, float timeout, float* ret_timeout)
 {
 	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
 	virtuaSMU->SystemConfig_LoadDefault (&timeout);
 	*ret_timeout = timeout;
 }
+
+/************************************************************************/
 
 void SystemConfig_Get_hardwareVersion (int deviceID,
 		float timeout, unsigned int* ret_hardwareVersion, float* ret_timeout)
@@ -627,6 +633,8 @@ void SystemConfig_Get_hardwareVersion (int deviceID,
 
 	*ret_hardwareVersion = hardwareVersion_;
 }
+
+/************************************************************************/
 
 void SystemConfig_Set_hardwareVersion (int deviceID,
 					unsigned int hardwareVersion, float timeout,
@@ -646,8 +654,8 @@ void SystemConfig_Set_hardwareVersion (int deviceID,
 	*ret_hardwareVersion = hardwareVersion_;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void library_version (int deviceID, unsigned int* version)
 {
@@ -689,8 +697,8 @@ unsigned int bugfix_version_no (unsigned int version)
 	return smu::BUGFIX_VERSION_NO (version);
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void VM2_setRange(int deviceID, int range, float timeout,
 				  unsigned int *ret_range, float *ret_timeout)
@@ -709,7 +717,7 @@ void VM2_setRange(int deviceID, int range, float timeout,
 	*ret_range = range_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM2_getCalibration(int deviceID, unsigned int index,
 						float timeout, unsigned int *ret_index,
@@ -735,7 +743,7 @@ void VM2_getCalibration(int deviceID, unsigned int index,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM2_setCalibration(int deviceID, unsigned int index, float voltage,
 						float timeout, unsigned int *ret_index, int *ret_adc,
@@ -761,7 +769,7 @@ void VM2_setCalibration(int deviceID, unsigned int index, float voltage,
 	*ret_voltage = voltage_;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM2_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 {
@@ -770,7 +778,7 @@ void VM2_saveCalibration(int deviceID, float timeout, float *ret_timeout)
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
 
 void VM2_getReading(int deviceID, unsigned int filterLength, float timeout,
 					float *ret_voltage, float *ret_timeout)
@@ -791,6 +799,8 @@ void VM2_getReading(int deviceID, unsigned int filterLength, float timeout,
 	*ret_voltage = voltage_;
 }
 
+/************************************************************************/
+
 void VM2_loadDefaultCalibration(int deviceID, float timeout,
 								float *ret_timeout)
 {
@@ -799,7 +809,8 @@ void VM2_loadDefaultCalibration(int deviceID, float timeout,
 	*ret_timeout = timeout;
 }
 
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void VM_setTerminal(int deviceID, int terminal, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout)
@@ -812,12 +823,14 @@ void VM_setTerminal(int deviceID, int terminal, float timeout,
 	virtuaSMU->VM_setTerminal(&terminal_, &timeout_);
 
 	*ret_terminal = 0;
+
 	if ((*ret_timeout = timeout_) == 0)
 		return;
 
 	*ret_terminal = terminal_;
 }
 
+/************************************************************************/
 
 void VM_getTerminal(int deviceID, float timeout,
 				 unsigned int *ret_terminal, float *ret_timeout)
@@ -830,11 +843,125 @@ void VM_getTerminal(int deviceID, float timeout,
 	virtuaSMU->VM_getTerminal(&terminal_, &timeout_);
 
 	*ret_terminal = 0;
+
 	if ((*ret_timeout = timeout_) == 0)
 		return;
 
 	*ret_terminal = terminal_;
 }
 
-/********************************************************************/
-/********************************************************************/
+/************************************************************************/
+/************************************************************************/
+
+void changeBaud (int deviceID, unsigned int baudRate, float timeout,
+				unsigned int *ret_baudRate, float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	unsigned int baudRate_ = baudRate;
+	float timeout_ = timeout;
+
+	virtuaSMU->changeBaud (&baudRate_, &timeout_);
+
+	*ret_baudRate = 9600;
+
+	if ((*ret_timeout = timeout_) == 0)
+        return;
+
+	*ret_baudRate = baudRate_;
+}
+
+/************************************************************************/
+
+std::vector<float> getData (int deviceID)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	std::vector<float> data_ = virtuaSMU->getData();
+
+	return data_;
+}
+
+/************************************************************************/
+
+void StartRec (int deviceID, float timeout,
+				float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	float timeout_ = timeout;
+	virtuaSMU->StartRec(&timeout_);
+
+	*ret_timeout = timeout_;
+}
+
+void StopRec (int deviceID, float timeout,
+				float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	float timeout_ = timeout;
+	virtuaSMU->StopRec(&timeout_);
+
+	*ret_timeout = timeout_;
+}
+
+/************************************************************************/
+//Only for testing
+
+void keepAlive (int deviceID, unsigned int lease_time_ms, float timeout,
+				unsigned int *ret_lease_time_ms, float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	unsigned int lease_time_ms_ = lease_time_ms;
+	float timeout_ = timeout;
+
+	virtuaSMU->keepAlive (&lease_time_ms_, &timeout_);
+
+	*ret_lease_time_ms = 0;
+
+	if ((*ret_timeout = timeout_) == 0)
+        return;
+
+	*ret_lease_time_ms = lease_time_ms_;
+}
+
+void recSize (int deviceID, float timeout,
+			  short unsigned int *ret_recSize, float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	short unsigned int recSize_;
+	float timeout_ = timeout;
+
+	virtuaSMU->recSize (&recSize_, &timeout_);
+
+	*ret_recSize = 0;
+
+	if ((*ret_timeout = timeout_) == 0)
+        return;
+
+	*ret_recSize = recSize_;
+}
+
+void recData (int deviceID, short unsigned int size, float timeout,
+			  short unsigned int *ret_size, float *ret_timeout)
+{
+	VirtuaSMU *virtuaSMU = virtuaSMUs[deviceID];
+
+	short unsigned int size_ = size;
+	float timeout_ = timeout;
+
+	virtuaSMU->recData (&size_, &timeout_);
+
+    *ret_size = 0;
+
+	if ((*ret_timeout = timeout_) == 0)
+        return;
+
+	*ret_size = size_;
+}
+
+/************************************************************************/
+/************************************************************************/

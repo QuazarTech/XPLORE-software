@@ -52,6 +52,20 @@ public:
 		return calibration_[index].second();
 	}
 
+
+public:
+	void setActiveCalibration (uint16_t index, int32_t adc, float voltage) {
+		activeCalibration_[index].set (adc, voltage);
+	}
+
+	int32_t activeCalibration_adc (uint16_t index) const {
+		return activeCalibration_[index].first();
+	}
+
+	float activeCalibration_voltage (uint16_t index) const {
+		return activeCalibration_[index].second();
+	}
+
 public:
 	VM_Terminal terminal (void) const { return terminal_;   }
 	void        setTerminal (VM_Terminal __terminal) { terminal_ = __terminal;}
@@ -60,8 +74,9 @@ private:
 	VM_Range            range_;
 	float               voltage_;
 	VM_CalibrationTable calibration_;
+	VM_CalibrationTable activeCalibration_;
 	VM_Terminal         terminal_;
 };
-} //namespace smu 
+} //namespace smu
 
 #endif

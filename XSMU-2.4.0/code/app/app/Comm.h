@@ -10,16 +10,17 @@
 #include <stdint.h>
 #include <string>
 #include <cstddef>
+#include <mutex>
 
 namespace smu{
 
-/******************************************************************/
+/************************************************************************/
 
 enum Comm_Opcode
 {
 	COMM_OPCODE_NOP,                                                //00
 	COMM_OPCODE_IDN,                                                //01
-	COMM_OPCODE_SYNC,                                               //02
+	COMM_OPCODE_KEEP_ALIVE,                                         //02
 	COMM_OPCODE_SET_SOURCE_MODE,                                    //03
 	COMM_OPCODE_CS_SET_RANGE,                                       //04
 	COMM_OPCODE_CS_GET_CALIBRATION,                                 //05
@@ -64,6 +65,12 @@ enum Comm_Opcode
 	COMM_OPCODE_VM2_LOAD_DEFAULT_CALIBRATION,                       //40
 	COMM_OPCODE_VM_SET_TERMINAL,                                    //41
 	COMM_OPCODE_VM_GET_TERMINAL,                                    //42
+
+	COMM_OPCODE_CHANGE_BAUD,                                        //43
+	COMM_OPCODE_REC_SIZE,                                           //44
+	COMM_OPCODE_REC_DATA,                                           //45
+	COMM_OPCODE_START_REC,                                          //46
+	COMM_OPCODE_STOP_REC,                                           //47
 };
 
 enum Comm_SourceMode
@@ -132,7 +139,7 @@ enum Comm_VM_Terminal
 
 Comm_VM_Terminal toComm_VM_Terminal (uint16_t i);
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket
 {
@@ -150,7 +157,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_Identity : public CommPacket
 {
@@ -197,29 +204,40 @@ private:
 	CommResponse_Identity (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
-class CommPacket_Synchronize : public CommPacket
+class CommPacket_keepAlive : public CommPacket
 {
 protected:
-	CommPacket_Synchronize (void) :
-		CommPacket (COMM_OPCODE_SYNC)
+	CommPacket_keepAlive (void) :
+		CommPacket (COMM_OPCODE_KEEP_ALIVE)
 	{}
 };
 
-class CommRequest_Synchronize : public CommPacket_Synchronize
+class CommRequest_keepAlive : public CommPacket_keepAlive
 {
 public:
-	CommRequest_Synchronize (void) {}
+	CommRequest_keepAlive (uint32_t lease_time_ms) :
+		lease_time_ms_ (smu::hton (lease_time_ms))
+	{}
+
+private:
+	uint32_t lease_time_ms_;
 };
 
-class CommResponse_Synchronize : public CommPacket_Synchronize
+class CommResponse_keepAlive : public CommPacket_keepAlive
 {
 private:
-	CommResponse_Synchronize (void);
+	CommResponse_keepAlive (void);
+
+public:
+	uint32_t lease_time_ms (void) const {return smu::ntoh(lease_time_ms_);}
+
+private:
+	uint32_t lease_time_ms_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_SetSourceMode : public CommPacket
 {
@@ -257,8 +275,8 @@ private:
 	CommResponse_SetSourceMode (void);
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_SetRange : public CommPacket
 {
@@ -296,7 +314,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_GetCalibration : public CommPacket
 {
@@ -334,7 +352,7 @@ private:
 	float current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_VerifyCalibration : public CommPacket
 {
@@ -374,7 +392,7 @@ private:
 	float current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_SetCalibration : public CommPacket
 {
@@ -415,7 +433,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_SaveCalibration : public CommPacket
 {
@@ -437,7 +455,7 @@ private:
 	CommResponse_CS_SaveCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_SetCurrent : public CommPacket
 {
@@ -470,8 +488,8 @@ private:
 	float current_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_SetRange : public CommPacket
 {
@@ -509,7 +527,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_GetCalibration : public CommPacket
 {
@@ -547,7 +565,7 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_VerifyCalibration : public CommPacket
 {
@@ -587,7 +605,7 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_SetCalibration : public CommPacket
 {
@@ -628,7 +646,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_SaveCalibration : public CommPacket
 {
@@ -650,7 +668,7 @@ private:
 	CommResponse_VS_SaveCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_SetVoltage : public CommPacket
 {
@@ -683,8 +701,8 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_SetRange : public CommPacket
 {
@@ -722,7 +740,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_GetCalibration : public CommPacket
 {
@@ -762,7 +780,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_SetCalibration : public CommPacket
 {
@@ -804,7 +822,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_SaveCalibration : public CommPacket
 {
@@ -826,7 +844,7 @@ private:
 	CommResponse_CM_SaveCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_Read : public CommPacket
 {
@@ -861,8 +879,8 @@ private:
 	float current_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_SetRange : public CommPacket
 {
@@ -900,7 +918,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_GetCalibration : public CommPacket
 {
@@ -940,7 +958,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_SetCalibration : public CommPacket
 {
@@ -982,7 +1000,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_SaveCalibration : public CommPacket
 {
@@ -1004,7 +1022,7 @@ private:
 	CommResponse_VM_SaveCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_Read : public CommPacket
 {
@@ -1039,7 +1057,7 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CS_LoadDefaultCalibration : public CommPacket
 {
@@ -1061,7 +1079,7 @@ private:
 	CommResponse_CS_LoadDefaultCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VS_LoadDefaultCalibration : public CommPacket
 {
@@ -1083,7 +1101,7 @@ private:
 	CommResponse_VS_LoadDefaultCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_CM_LoadDefaultCalibration : public CommPacket
 {
@@ -1105,7 +1123,7 @@ private:
 	CommResponse_CM_LoadDefaultCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_LoadDefaultCalibration : public CommPacket
 {
@@ -1127,8 +1145,8 @@ private:
 	CommResponse_VM_LoadDefaultCalibration (void);
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_RM_ReadAutoscale : public CommPacket
 {
@@ -1163,8 +1181,8 @@ private:
 	float resistance_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 enum SystemConfigParamID
 {
@@ -1208,7 +1226,7 @@ private:
 	CommResponse_SystemConfig_Get (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_SystemConfig_Set : public CommPacket
 {
@@ -1245,7 +1263,7 @@ private:
 	CommResponse_SystemConfig_Set (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_SystemConfig_Save : public CommPacket
 {
@@ -1267,7 +1285,7 @@ private:
 	CommResponse_SystemConfig_Save (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_SystemConfig_LoadDefault : public CommPacket
 {
@@ -1291,8 +1309,8 @@ private:
 	CommResponse_SystemConfig_LoadDefault (void);
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_SetRange : public CommPacket
 {
@@ -1330,7 +1348,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_GetCalibration : public CommPacket
 {
@@ -1370,7 +1388,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_SetCalibration : public CommPacket
 {
@@ -1412,7 +1430,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_SaveCalibration : public CommPacket
 {
@@ -1434,7 +1452,7 @@ private:
 	CommResponse_VM2_SaveCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_Read : public CommPacket
 {
@@ -1469,7 +1487,7 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM2_LoadDefaultCalibration : public CommPacket
 {
@@ -1491,7 +1509,7 @@ private:
 	CommResponse_VM2_LoadDefaultCalibration (void);
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_SetTerminal : public CommPacket
 {
@@ -1529,7 +1547,7 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommPacket_VM_GetTerminal : public CommPacket
 {
@@ -1561,67 +1579,223 @@ private:
 	uint16_t reserve_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+
+class CommPacket_changeBaud : public CommPacket
+{
+protected:
+	CommPacket_changeBaud (void) :
+		CommPacket (COMM_OPCODE_CHANGE_BAUD)
+	{}
+};
+
+class CommRequest_changeBaud : public CommPacket_changeBaud
+{
+public:
+	CommRequest_changeBaud (uint32_t baudRate) :
+		baudRate_ (smu::hton (baudRate))
+	{}
+
+private:
+	uint32_t baudRate_;
+};
+
+class CommResponse_changeBaud : public CommPacket_changeBaud
+{
+private:
+	CommResponse_changeBaud (void);
+
+public:
+	uint32_t baudRate (void) const {return smu::ntoh(baudRate_);}
+
+private:
+	uint32_t baudRate_;
+};
+
+/************************************************************************/
+
+class CommPacket_recSize : public CommPacket
+{
+protected:
+	CommPacket_recSize (void) :
+		CommPacket (COMM_OPCODE_REC_SIZE)
+	{}
+};
+
+class CommRequest_recSize : public CommPacket_recSize
+{
+public:
+	CommRequest_recSize (void)
+	{}
+};
+
+class CommResponse_recSize : public CommPacket_recSize
+{
+private:
+	CommResponse_recSize (void);
+
+public:
+	uint16_t recSize (void) const {return smu::ntoh(recSize_);}
+
+private:
+	uint16_t recSize_;
+    uint16_t reserve_;
+};
+
+/************************************************************************/
+
+class CommPacket_recData : public CommPacket
+{
+protected:
+	CommPacket_recData (void) :
+		CommPacket (COMM_OPCODE_REC_DATA)
+	{}
+};
+
+class CommRequest_recData : public CommPacket_recData
+{
+public:
+	CommRequest_recData (uint16_t size) :
+		size_ (smu::hton (size)),
+		reserve_ (0)
+	{}
+
+private:
+	uint16_t size_;
+	uint16_t reserve_;
+};
+
+class CommResponse_recData : public CommPacket_recData
+{
+private:
+	CommResponse_recData (void);
+
+public:
+	uint16_t size (void) const {return smu::ntoh(size_);}
+
+	int32_t recData (uint16_t idx) const
+	{
+        return smu::ntoh(recData_[idx]);
+	}
+
+private:
+	uint16_t size_;
+	uint16_t reserve_;
+	int32_t recData_[];
+};
+
+/************************************************************************/
+
+class CommPacket_StartRec : public CommPacket
+{
+protected:
+	CommPacket_StartRec (void) :
+		CommPacket (COMM_OPCODE_START_REC)
+	{}
+};
+
+class CommRequest_StartRec : public CommPacket_StartRec
+{
+public:
+	CommRequest_StartRec (void) {}
+};
+
+class CommResponse_StartRec : public CommPacket_StartRec
+{
+private:
+	CommResponse_StartRec (void);
+};
+
+/************************************************************************/
+
+class CommPacket_StopRec : public CommPacket
+{
+protected:
+	CommPacket_StopRec (void) :
+		CommPacket (COMM_OPCODE_STOP_REC)
+	{}
+};
+
+class CommRequest_StopRec : public CommPacket_StopRec
+{
+public:
+	CommRequest_StopRec (void) {}
+};
+
+class CommResponse_StopRec : public CommPacket_StopRec
+{
+private:
+	CommResponse_StopRec (void);
+};
+
+/************************************************************************/
+/************************************************************************/
 
 enum Comm_CallbackCode
 {
-	COMM_CBCODE_NOP,
-	COMM_CBCODE_IDN,
-	COMM_CBCODE_SYNC,
+	COMM_CBCODE_NOP,                                          //00
+	COMM_CBCODE_IDN,                                          //01
+	COMM_CBCODE_KEEP_ALIVE,                                   //02
 
-	COMM_CBCODE_SET_SOURCE_MODE,
+	COMM_CBCODE_SET_SOURCE_MODE,                              //03
 
-	COMM_CBCODE_CS_SET_RANGE,
-	COMM_CBCODE_CS_GET_CALIBRATION,
-	COMM_CBCODE_CS_VERIFY_CALIBRATION,
-	COMM_CBCODE_CS_SET_CALIBRATION,
-	COMM_CBCODE_CS_SAVE_CALIBRATION,
-	COMM_CBCODE_CS_SET_CURRENT,
+	COMM_CBCODE_CS_SET_RANGE,                                 //04
+	COMM_CBCODE_CS_GET_CALIBRATION,                           //05
+	COMM_CBCODE_CS_VERIFY_CALIBRATION,                        //06
+	COMM_CBCODE_CS_SET_CALIBRATION,                           //07
+	COMM_CBCODE_CS_SAVE_CALIBRATION,                          //08
+	COMM_CBCODE_CS_SET_CURRENT,                               //09
 
-	COMM_CBCODE_VS_SET_RANGE,
-	COMM_CBCODE_VS_GET_CALIBRATION,
-	COMM_CBCODE_VS_VERIFY_CALIBRATION,
-	COMM_CBCODE_VS_SET_CALIBRATION,
-	COMM_CBCODE_VS_SAVE_CALIBRATION,
-	COMM_CBCODE_VS_SET_VOLTAGE,
+	COMM_CBCODE_VS_SET_RANGE,                                 //10
+	COMM_CBCODE_VS_GET_CALIBRATION,                           //11
+	COMM_CBCODE_VS_VERIFY_CALIBRATION,                        //12
+	COMM_CBCODE_VS_SET_CALIBRATION,                           //13
+	COMM_CBCODE_VS_SAVE_CALIBRATION,                          //14
+	COMM_CBCODE_VS_SET_VOLTAGE,                               //15
 
-	COMM_CBCODE_CM_SET_RANGE,
-	COMM_CBCODE_CM_GET_CALIBRATION,
-	COMM_CBCODE_CM_SET_CALIBRATION,
-	COMM_CBCODE_CM_SAVE_CALIBRATION,
-	COMM_CBCODE_CM_READ,
+	COMM_CBCODE_CM_SET_RANGE,                                 //16
+	COMM_CBCODE_CM_GET_CALIBRATION,                           //17
+	COMM_CBCODE_CM_SET_CALIBRATION,                           //18
+	COMM_CBCODE_CM_SAVE_CALIBRATION,                          //19
+	COMM_CBCODE_CM_READ,                                      //20
 
-	COMM_CBCODE_VM_SET_RANGE,
-	COMM_CBCODE_VM_GET_CALIBRATION,
-	COMM_CBCODE_VM_SET_CALIBRATION,
-	COMM_CBCODE_VM_SAVE_CALIBRATION,
-	COMM_CBCODE_VM_READ,
+	COMM_CBCODE_VM_SET_RANGE,                                 //21
+	COMM_CBCODE_VM_GET_CALIBRATION,                           //22
+	COMM_CBCODE_VM_SET_CALIBRATION,                           //23
+	COMM_CBCODE_VM_SAVE_CALIBRATION,                          //24
+	COMM_CBCODE_VM_READ,                                      //25
 
-	COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION,
-	COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION,
+	COMM_CBCODE_CS_LOAD_DEFAULT_CALIBRATION,                  //26
+	COMM_CBCODE_VS_LOAD_DEFAULT_CALIBRATION,                  //27
+	COMM_CBCODE_CM_LOAD_DEFAULT_CALIBRATION,                  //28
+	COMM_CBCODE_VM_LOAD_DEFAULT_CALIBRATION,                  //29
 
-	COMM_CBCODE_RM_READ_AUTOSCALE,
+	COMM_CBCODE_RM_READ_AUTOSCALE,                            //30
 
-	COMM_CBCODE_SYSTEM_CONFIG_GET,
-	COMM_CBCODE_SYSTEM_CONFIG_SET,
-	COMM_CBCODE_SYSTEM_CONFIG_SAVE,
-	COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT,
+	COMM_CBCODE_SYSTEM_CONFIG_GET,                            //31
+	COMM_CBCODE_SYSTEM_CONFIG_SET,                            //32
+	COMM_CBCODE_SYSTEM_CONFIG_SAVE,                           //33
+	COMM_CBCODE_SYSTEM_CONFIG_LOAD_DEFAULT,                   //34
 
-	COMM_CBCODE_VM2_SET_RANGE,
-	COMM_CBCODE_VM2_GET_CALIBRATION,
-	COMM_CBCODE_VM2_SET_CALIBRATION,
-	COMM_CBCODE_VM2_SAVE_CALIBRATION,
-	COMM_CBCODE_VM2_READ,
-	COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION,
+	COMM_CBCODE_VM2_SET_RANGE,                                //35
+	COMM_CBCODE_VM2_GET_CALIBRATION,                          //36
+	COMM_CBCODE_VM2_SET_CALIBRATION,                          //37
+	COMM_CBCODE_VM2_SAVE_CALIBRATION,                         //38
+	COMM_CBCODE_VM2_READ,                                     //39
+	COMM_CBCODE_VM2_LOAD_DEFAULT_CALIBRATION,                 //40
 
-	COMM_CBCODE_VM_SET_TERMINAL,
-	COMM_CBCODE_VM_GET_TERMINAL,
+	COMM_CBCODE_VM_SET_TERMINAL,                              //41
+	COMM_CBCODE_VM_GET_TERMINAL,                              //42
+
+	COMM_CBCODE_CHANGE_BAUD,                                  //43
+	COMM_CBCODE_REC_SIZE,                                     //44
+	COMM_CBCODE_REC_DATA,                                     //45
+	COMM_CBCODE_START_REC,                                    //46
+	COMM_CBCODE_STOP_REC,                                     //47
 };
 
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB
 {
@@ -1637,7 +1811,7 @@ private:
 	Comm_CallbackCode code_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_Identity : public CommCB
 {
@@ -1662,13 +1836,24 @@ private:
 	uint32_t firmware_version_;
 };
 
-class CommCB_Sync : public CommCB
+/************************************************************************/
+
+class CommCB_keepAlive : public CommCB
 {
 public:
-	CommCB_Sync (void) :
-		CommCB (COMM_CBCODE_SYNC)
+	CommCB_keepAlive (uint32_t lease_time_ms) :
+		CommCB (COMM_CBCODE_KEEP_ALIVE),
+		lease_time_ms_ (lease_time_ms)
 	{}
+
+public:
+	uint32_t lease_time_ms (void) const {return lease_time_ms_;}
+
+private:
+	uint32_t lease_time_ms_;
 };
+
+/************************************************************************/
 
 class CommCB_SetSourceMode : public CommCB
 {
@@ -1685,8 +1870,8 @@ private:
 	Comm_SourceMode mode_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_CS_SetRange : public CommCB
 {
@@ -1703,7 +1888,7 @@ private:
 	Comm_CS_Range range_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CS_GetCalibration : public CommCB
 {
@@ -1726,7 +1911,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CS_VerifyCalibration : public CommCB
 {
@@ -1749,7 +1934,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CS_SetCalibration : public CommCB
 {
@@ -1772,7 +1957,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CS_SaveCalibration : public CommCB
 {
@@ -1797,8 +1982,8 @@ private:
 	float current_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_VS_SetRange : public CommCB
 {
@@ -1815,7 +2000,7 @@ private:
 	Comm_VS_Range range_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VS_GetCalibration : public CommCB
 {
@@ -1838,7 +2023,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VS_VerifyCalibration : public CommCB
 {
@@ -1861,7 +2046,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VS_SetCalibration : public CommCB
 {
@@ -1884,7 +2069,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VS_SaveCalibration : public CommCB
 {
@@ -1909,8 +2094,8 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_CM_SetRange : public CommCB
 {
@@ -1927,7 +2112,7 @@ private:
 	Comm_CM_Range range_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CM_GetCalibration : public CommCB
 {
@@ -1950,7 +2135,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CM_SetCalibration : public CommCB
 {
@@ -1973,7 +2158,7 @@ private:
 	float    current_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CM_SaveCalibration : public CommCB
 {
@@ -1983,7 +2168,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CM_Read : public CommCB
 {
@@ -2000,8 +2185,8 @@ private:
 	float current_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_VM_SetRange : public CommCB
 {
@@ -2018,7 +2203,7 @@ private:
 	Comm_VM_Range range_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_GetCalibration : public CommCB
 {
@@ -2041,7 +2226,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_SetCalibration : public CommCB
 {
@@ -2064,7 +2249,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_SaveCalibration : public CommCB
 {
@@ -2074,7 +2259,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_Read : public CommCB
 {
@@ -2091,8 +2276,8 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_CS_LoadDefaultCalibration : public CommCB
 {
@@ -2102,7 +2287,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VS_LoadDefaultCalibration : public CommCB
 {
@@ -2112,7 +2297,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_CM_LoadDefaultCalibration : public CommCB
 {
@@ -2122,7 +2307,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_LoadDefaultCalibration : public CommCB
 {
@@ -2132,8 +2317,8 @@ public:
 	{}
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_RM_ReadAutoscale : public CommCB
 {
@@ -2150,8 +2335,8 @@ private:
 	float resistance_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_SystemConfig_Get : public CommCB
 {
@@ -2205,8 +2390,8 @@ public:
 	{}
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_SetRange : public CommCB
 {
@@ -2223,7 +2408,7 @@ private:
 	Comm_VM2_Range range_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_GetCalibration : public CommCB
 {
@@ -2246,7 +2431,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_SetCalibration : public CommCB
 {
@@ -2269,7 +2454,7 @@ private:
 	float    voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_SaveCalibration : public CommCB
 {
@@ -2279,7 +2464,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_Read : public CommCB
 {
@@ -2296,7 +2481,7 @@ private:
 	float voltage_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM2_LoadDefaultCalibration : public CommCB
 {
@@ -2306,7 +2491,7 @@ public:
 	{}
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_SetTerminal : public CommCB
 {
@@ -2323,7 +2508,7 @@ private:
 	Comm_VM_Terminal terminal_;
 };
 
-/******************************************************************/
+/************************************************************************/
 
 class CommCB_VM_GetTerminal : public CommCB
 {
@@ -2340,15 +2525,94 @@ private:
 	Comm_VM_Terminal terminal_;
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+
+class CommCB_changeBaud : public CommCB
+{
+public:
+	CommCB_changeBaud (uint32_t baudRate) :
+		CommCB (COMM_CBCODE_CHANGE_BAUD),
+		baudRate_ (baudRate)
+	{}
+
+public:
+	uint32_t baudRate (void) const {return baudRate_;}
+
+private:
+	uint32_t baudRate_;
+};
+
+/************************************************************************/
+
+class CommCB_recSize : public CommCB
+{
+public:
+	CommCB_recSize (uint32_t recSize) :
+		CommCB (COMM_CBCODE_REC_SIZE),
+		recSize_ (recSize)
+	{}
+
+public:
+	uint32_t recSize (void) const {return recSize_;}
+
+private:
+	uint32_t recSize_;
+};
+
+/************************************************************************/
+
+class CommCB_recData : public CommCB
+{
+public:
+	CommCB_recData (uint16_t size, std::vector<int32_t> recData) :
+		CommCB (COMM_CBCODE_REC_DATA),
+		size_ (size),
+		recData_ (recData)
+
+	{}
+
+public:
+	uint16_t size (void) const {return size_;}
+	std::vector<int32_t> recData (void) const {return recData_;}
+
+private:
+	uint16_t size_;
+	std::vector<int32_t> recData_;
+};
+
+/************************************************************************/
+
+class CommCB_StartRec : public CommCB
+{
+public:
+	CommCB_StartRec (void) :
+		CommCB (COMM_CBCODE_START_REC)
+	{}
+};
+
+/************************************************************************/
+
+class CommCB_StopRec : public CommCB
+{
+public:
+	CommCB_StopRec (void) :
+		CommCB (COMM_CBCODE_STOP_REC)
+	{}
+};
+/************************************************************************/
+/************************************************************************/
 
 union CommCB_Union
 {
 	char gen0[sizeof (CommCB)];
 	char gen1[sizeof (CommCB_Identity)];
-	char gen2[sizeof (CommCB_Sync)];
+	char gen2[sizeof (CommCB_keepAlive)];
 	char gen3[sizeof (CommCB_SetSourceMode)];
+	char gen4[sizeof (CommCB_changeBaud)];
+	char gen5[sizeof (CommCB_recSize)];
+	char gen6[sizeof (CommCB_recData)];
+	char gen7[sizeof (CommCB_StartRec)];
+	char gen8[sizeof (CommCB_StopRec)];
 
 	char cs0[sizeof (CommCB_CS_SetRange)];
 	char cs1[sizeof (CommCB_CS_GetCalibration)];
@@ -2398,8 +2662,8 @@ union CommCB_Union
 	char vm7[sizeof (CommCB_VM_GetTerminal)];
 };
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 class Comm : public Applet
 {
@@ -2417,7 +2681,7 @@ public:
 public:
 	void check (void);
 	void transmitIdentify (void);
-	void transmitSync (void);
+	void transmit_keepAlive (uint32_t lease_time_ms);
 	void transmitSourceMode (Comm_SourceMode mode);
 
 	/********************************/
@@ -2482,10 +2746,17 @@ public:
 	void transmit_VM2_loadDefaultCalibration (void);
 
 	/********************************/
-	
-	void transmit_VM_setTerminal      (Comm_VM_Terminal terminal);
-	void transmit_VM_getTerminal      (void);
-	
+
+	void transmit_VM_setTerminal (Comm_VM_Terminal terminal);
+	void transmit_VM_getTerminal (void);
+
+	/********************************/
+
+	void transmit_changeBaud     (uint32_t baudRate);
+	void transmit_recSize (void);
+	void transmit_recData (uint16_t recSize);
+	void transmit_StartRec (void);
+	void transmit_StopRec (void);
 
 private:
 	QP4* qp4_;
@@ -2500,7 +2771,7 @@ private:
 
 	void nopCB                    (const void* data, uint16_t size);
 	void identityCB               (const void* data, uint16_t size);
-	void syncCB                   (const void* data, uint16_t size);
+	void keepAliveCB              (const void* data, uint16_t size);
 
 	void setSourceModeCB          (const void* data, uint16_t size);
 
@@ -2537,26 +2808,45 @@ private:
 
 	void RM_readAutoscaleCB (const void* data, uint16_t size);
 
-	void SystemConfig_GetCB (const void* data, uint16_t size);
-	void SystemConfig_SetCB (const void* data, uint16_t size);
-	void SystemConfig_SaveCB (const void* data, uint16_t size);
+	void SystemConfig_GetCB         (const void* data, uint16_t size);
+	void SystemConfig_SetCB         (const void* data, uint16_t size);
+	void SystemConfig_SaveCB        (const void* data, uint16_t size);
 	void SystemConfig_LoadDefaultCB (const void* data, uint16_t size);
 
-	void VM2_setRangeCB            (const void* data, uint16_t size);
-	void VM2_getCalibrationCB      (const void* data, uint16_t size);
-	void VM2_setCalibrationCB      (const void* data, uint16_t size);
-	void VM2_saveCalibrationCB     (const void* data, uint16_t size);
-	void VM2_readCB                (const void* data, uint16_t size);
+	void VM2_setRangeCB               (const void* data, uint16_t size);
+	void VM2_getCalibrationCB         (const void* data, uint16_t size);
+	void VM2_setCalibrationCB         (const void* data, uint16_t size);
+	void VM2_saveCalibrationCB        (const void* data, uint16_t size);
+	void VM2_readCB                   (const void* data, uint16_t size);
 	void VM2_loadDefaultCalibrationCB (const void* data, uint16_t size);
 
-	void VM_setTerminalCB     (const void* data, uint16_t size);
-	void VM_getTerminalCB     (const void* data, uint16_t size);
+	void VM_setTerminalCB (const void* data, uint16_t size);
+	void VM_getTerminalCB (const void* data, uint16_t size);
+
+	void changeBaudCB     (const void* data, uint16_t size);
+
+	void recSizeCB  (const void* data, uint16_t size);
+	void recDataCB  (const void* data, uint16_t size);
+	void StartRecCB (const void* data, uint16_t size);
+	void StopRecCB  (const void* data, uint16_t size);
 
 private:
 	void transmit (const QP4_Packet* packet);
+
+public:
+	void setBaudRate (uint32_t baudRate);
+
+public:
+	std::unique_lock<std::mutex> lock (void)
+	{
+		return std::unique_lock<std::mutex> (_lock);
+	}
+
+private:
+	std::mutex _lock;
 };
 
-/******************************************************************/
+/************************************************************************/
 } // namespace smu
 
 #endif

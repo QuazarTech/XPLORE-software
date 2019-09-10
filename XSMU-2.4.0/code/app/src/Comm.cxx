@@ -1,8 +1,13 @@
 #include "../app/Comm.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <vector>
+
+#define PRINT_DEBUG(x) { \
+std::cerr << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":" << x << std::endl; }
 
 using namespace std;
 
@@ -101,8 +106,8 @@ Comm_VM_Terminal toComm_VM_Terminal (uint16_t i)
 		values[i] : values[0];
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 Comm::Comm (void)
 {
@@ -132,16 +137,22 @@ void Comm::check (void)
 	checkReceiveQueue();
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit (const QP4_Packet* packet)
 {
 	ftdi_->write (packet, packet->size());
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+
+void Comm::setBaudRate (uint32_t baudRate)
+{
+	ftdi_->setBaudRate (baudRate);
+}
+
+/************************************************************************/
+/************************************************************************/
 
 void Comm::checkReceiveQueue (void)
 {
@@ -158,6 +169,7 @@ void Comm::processReceivedData (const void* data, uint16_t size)
 
 	if (size) do {
 
+		//std::printf ("%X %c\n", static_cast<unsigned> (*src), *src);
 		qp4_->receiver().push_back (*src++);
 
 		if (qp4_->receiver().ready()) {
@@ -180,7 +192,7 @@ void Comm::interpret (const void* data, uint16_t size)
 	{
 		&Comm::nopCB,
 		&Comm::identityCB,
-		&Comm::syncCB,
+		&Comm::keepAliveCB,
 		&Comm::setSourceModeCB,
 
 		&Comm::CS_setRangeCB,
@@ -230,6 +242,12 @@ void Comm::interpret (const void* data, uint16_t size)
 
 		&Comm::VM_setTerminalCB,
 		&Comm::VM_getTerminalCB,
+
+		&Comm::changeBaudCB,
+		&Comm::recSizeCB,
+		&Comm::recDataCB,
+		&Comm::StartRecCB,
+		&Comm::StopRecCB,
 	};
 
 	if (size < sizeof (CommPacket))
@@ -242,10 +260,13 @@ void Comm::interpret (const void* data, uint16_t size)
 		(this->*cbs[packet->opcode()])(data, size);
 }
 
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::nopCB (const void* data, uint16_t size)
 {}
+
+/************************************************************************/
 
 void Comm::identityCB (const void* data, uint16_t size)
 {
@@ -258,10 +279,20 @@ void Comm::identityCB (const void* data, uint16_t size)
 		res->containsVersionInfo (size) ? res->firmware_version() : 0));
 }
 
-void Comm::syncCB (const void* data, uint16_t size)
+/************************************************************************/
+
+void Comm::keepAliveCB (const void* data, uint16_t size)
 {
-	do_callback (new (&callbackObject_) CommCB_Sync);
+	if (size < sizeof (CommResponse_keepAlive))
+		return;
+
+	const CommResponse_keepAlive* res =
+		reinterpret_cast<const CommResponse_keepAlive*> (data);
+
+	do_callback (new (&callbackObject_) CommCB_keepAlive (res->lease_time_ms()));
 }
+
+/************************************************************************/
 
 void Comm::setSourceModeCB (const void* data, uint16_t size)
 {
@@ -274,7 +305,8 @@ void Comm::setSourceModeCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_) CommCB_SetSourceMode (res->mode()));
 }
 
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::CS_setRangeCB (const void* data, uint16_t size)
 {
@@ -346,7 +378,7 @@ void Comm::CS_setCurrentCB (const void* data, uint16_t size)
 		CommCB_CS_SetCurrent (res->current()));
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::VS_setRangeCB (const void* data, uint16_t size)
 {
@@ -418,7 +450,7 @@ void Comm::VS_setVoltageCB (const void* data, uint16_t size)
 		CommCB_VS_SetVoltage (res->voltage()));
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::CM_setRangeCB (const void* data, uint16_t size)
 {
@@ -478,7 +510,7 @@ void Comm::CM_readCB (const void* data, uint16_t size)
 		CommCB_CM_Read (res->current()));
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::VM_setRangeCB (const void* data, uint16_t size)
 {
@@ -538,7 +570,7 @@ void Comm::VM_readCB (const void* data, uint16_t size)
 		CommCB_VM_Read (res->voltage()));
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::CS_loadDefaultCalibrationCB (const void* data, uint16_t size)
 {
@@ -572,8 +604,8 @@ void Comm::VM_loadDefaultCalibrationCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_) CommCB_VM_LoadDefaultCalibration);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::RM_readAutoscaleCB (const void* data, uint16_t size)
 {
@@ -587,8 +619,8 @@ void Comm::RM_readAutoscaleCB (const void* data, uint16_t size)
 		CommCB_RM_ReadAutoscale (res->resistance()));
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::SystemConfig_GetCB (const void* data, uint16_t size)
 {
@@ -630,8 +662,8 @@ void Comm::SystemConfig_LoadDefaultCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_) CommCB_SystemConfig_LoadDefault);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::VM2_setRangeCB (const void* data, uint16_t size)
 {
@@ -699,7 +731,7 @@ void Comm::VM2_loadDefaultCalibrationCB (const void* data, uint16_t size)
 	do_callback (new (&callbackObject_) CommCB_VM2_LoadDefaultCalibration);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::VM_setTerminalCB (const void* data, uint16_t size)
 {
@@ -713,7 +745,6 @@ void Comm::VM_setTerminalCB (const void* data, uint16_t size)
 		CommCB_VM_SetTerminal (res->terminal()));
 }
 
-
 void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 {
 	if (size < sizeof (CommResponse_VM_GetTerminal))
@@ -726,8 +757,87 @@ void Comm::VM_getTerminalCB (const void* data, uint16_t size)
 		CommCB_VM_GetTerminal (res->terminal()));
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+
+void Comm::changeBaudCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_changeBaud))
+		return;
+
+	const CommResponse_changeBaud* res =
+		reinterpret_cast<const CommResponse_changeBaud*> (data);
+
+	do_callback (new (&callbackObject_)
+		CommCB_changeBaud (res->baudRate()));
+}
+
+void Comm::recSizeCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_recSize))
+		return;
+
+	const CommResponse_recSize* res =
+		reinterpret_cast<const CommResponse_recSize*> (data);
+
+	do_callback (new (&callbackObject_)
+		CommCB_recSize (res->recSize()));
+}
+
+/************************************************************************/
+
+void Comm::recDataCB (const void* data, uint16_t size)
+{
+	PRINT_DEBUG ("Size : " << size << "Expected : " << sizeof(CommResponse_recData))
+
+	if (size < sizeof (CommResponse_recData))
+	{
+		PRINT_DEBUG ("SIZE NOT OKAY")
+		return;
+	}
+
+	PRINT_DEBUG ("SIZE OKAY")
+
+	const CommResponse_recData* res =
+		reinterpret_cast<const CommResponse_recData*> (data);
+
+	//Construct a std::vector<int32_t> from the recieved data array
+	uint16_t n = res->size();
+	std::vector<int32_t> recData;
+
+	for (uint16_t i = 0; i < n; ++i)
+	{
+		recData.push_back (res->recData(i));
+		std::cout << "Data pushed: " << recData[i] << std::endl;
+	}
+
+	PRINT_DEBUG ("VECTOR CONSTRUCTED")
+
+	do_callback (new (&callbackObject_)
+		CommCB_recData (n, recData));
+}
+
+/************************************************************************/
+
+void Comm::StartRecCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_StartRec))
+		return;
+
+	do_callback (new (&callbackObject_) CommCB_StartRec);
+}
+
+/************************************************************************/
+
+void Comm::StopRecCB (const void* data, uint16_t size)
+{
+	if (size < sizeof (CommResponse_StopRec))
+		return;
+
+	do_callback (new (&callbackObject_) CommCB_StopRec);
+}
+
+/************************************************************************/
+/************************************************************************/
 
 void Comm::open (const char* serialNo)
 {
@@ -739,8 +849,8 @@ void Comm::close (void)
 	ftdi_->close();
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmitIdentify (void)
 {
@@ -754,17 +864,23 @@ void Comm::transmitIdentify (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-void Comm::transmitSync (void)
+/************************************************************************/
+
+void Comm::transmit_keepAlive (uint32_t lease_time_ms)
 {
 	QP4_Packet* req =
-		qp4_->transmitter().alloc_packet (sizeof (CommRequest_Synchronize));
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_keepAlive));
 
-	new (req->body()) CommRequest_Synchronize;
+	new (req->body())
+		CommRequest_keepAlive (lease_time_ms);
 
 	req->seal();
 	transmit (req);
+
 	qp4_->transmitter().free_packet (req);
 }
+/************************************************************************/
 
 void Comm::transmitSourceMode (Comm_SourceMode mode)
 {
@@ -780,7 +896,8 @@ void Comm::transmitSourceMode (Comm_SourceMode mode)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmit_CS_setRange (Comm_CS_Range range)
 {
@@ -866,7 +983,7 @@ void Comm::transmit_CS_setCurrent (float current)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VS_setRange (Comm_VS_Range range)
 {
@@ -944,16 +1061,19 @@ void Comm::transmit_VS_setVoltage (float voltage)
 	QP4_Packet* req =
 		qp4_->transmitter().alloc_packet (
 			sizeof (CommRequest_VS_SetVoltage));
+	//std::cout << "Comm : QP4_Packet allocated" << std::endl;
 
 	new (req->body())
 		CommRequest_VS_SetVoltage (voltage);
 
 	req->seal();
 	transmit (req);
+	//std::cout << "Comm : Packet Sealed and Transmitted" << std::endl;
+
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_CM_setRange (Comm_CM_Range range)
 {
@@ -1026,8 +1146,8 @@ void Comm::transmit_CM_read (uint16_t filterLength)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VM_setRange (Comm_VM_Range range)
 {
@@ -1100,8 +1220,8 @@ void Comm::transmit_VM_read (uint16_t filterLength)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmit_CS_loadDefaultCalibration (void)
 {
@@ -1117,7 +1237,7 @@ void Comm::transmit_CS_loadDefaultCalibration (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VS_loadDefaultCalibration (void)
 {
@@ -1133,7 +1253,7 @@ void Comm::transmit_VS_loadDefaultCalibration (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_CM_loadDefaultCalibration (void)
 {
@@ -1149,7 +1269,7 @@ void Comm::transmit_CM_loadDefaultCalibration (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VM_loadDefaultCalibration (void)
 {
@@ -1165,8 +1285,8 @@ void Comm::transmit_VM_loadDefaultCalibration (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmit_RM_readAutoscale (uint16_t filterLength)
 {
@@ -1182,8 +1302,8 @@ void Comm::transmit_RM_readAutoscale (uint16_t filterLength)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 void Comm::transmit_SystemConfig_Get (uint16_t paramID)
 {
@@ -1237,7 +1357,7 @@ void Comm::transmit_SystemConfig_LoadDefault (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VM2_setRange (Comm_VM2_Range range)
 {
@@ -1324,7 +1444,7 @@ void Comm::transmit_VM2_loadDefaultCalibration (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
+/************************************************************************/
 
 void Comm::transmit_VM_setTerminal (Comm_VM_Terminal terminal)
 {
@@ -1354,6 +1474,93 @@ void Comm::transmit_VM_getTerminal (void)
 	qp4_->transmitter().free_packet (req);
 }
 
-/******************************************************************/
-/******************************************************************/
+/************************************************************************/
+
+void Comm::transmit_changeBaud (uint32_t baudRate)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_changeBaud));
+
+	new (req->body())
+		CommRequest_changeBaud (baudRate);
+
+	req->seal();
+	transmit (req);
+
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_recSize (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_recSize));
+
+	new (req->body())
+		CommRequest_recSize();
+
+	req->seal();
+	transmit (req);
+
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_recData (uint16_t size)
+/*
+ * Creates and transmits a CommRequest_recData packet, requesting for
+ * 'size' number of datapoints of recorded data to be transmitted
+ */
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_recData));
+
+	new (req->body())
+		CommRequest_recData (size);
+
+	req->seal();
+	transmit (req);
+
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_StartRec (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_StartRec));
+
+	new (req->body())
+		CommRequest_StartRec;
+
+	req->seal();
+	transmit (req);
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+
+void Comm::transmit_StopRec (void)
+{
+	QP4_Packet* req =
+		qp4_->transmitter().alloc_packet (
+			sizeof (CommRequest_StopRec));
+
+	new (req->body())
+		CommRequest_StopRec;
+
+	req->seal();
+	transmit (req);
+	qp4_->transmitter().free_packet (req);
+}
+
+/************************************************************************/
+/************************************************************************/
 } // namespace smu

@@ -1,4 +1,5 @@
 import libxsmu, time, math
+from time import sleep
 
 ##########################################################################
 # Scans USB bus for Xplore SMU.
@@ -37,5 +38,5 @@ print libxsmu.firmware_version (deviceID)
 
 ##########################################################################
 # closes the device.
-
+sleep(100)
 libxsmu.close_device(deviceID)

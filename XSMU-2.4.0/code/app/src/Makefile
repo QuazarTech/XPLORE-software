@@ -10,7 +10,8 @@ CPP_SRC = \
 	VM2.cxx \
 	virtuaSMU.cxx \
 	SystemConfig.cxx \
-	version.cxx
+	version.cxx \
+	Exception.cxx \
 
 DEP = ${CPP_SRC:%.cxx=%.dep}
 OBJ = ${CPP_SRC:%.cxx=%.o}

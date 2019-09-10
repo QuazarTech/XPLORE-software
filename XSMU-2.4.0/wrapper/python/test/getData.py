@@ -1,4 +1,4 @@
-import libxsmu, time, math
+import libxsmu, time, math, sys
 from time import sleep
 
 ##########################################################################
@@ -30,26 +30,41 @@ if (timeout == 0.0) or (not goodID):
 	exit (-2)
 
 ##########################################################################
-# Selects source range to 1mA
+# Start recording streamed data from the XSMU
+
+timeout = 5
+timeout = libxsmu.StartRec (deviceID, timeout)
+print \
+	"Started Recording Streamed Data"
+
+sleep (5)
+
+##########################################################################
+# Get streamed data from data queue
+
+print \
+	"Getting Data"
 
 logfile = open ('log.txt', 'w')
 
-for n in range (0, 100):
-	filter_length = 32
-	timeout = 1 + 0.03 * filter_length
-	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
-	print \
-		"voltage               :", voltage, "\n" \
-		"Remaining time        :", timeout, "sec", "\n"
+t0 = time.time()
+_time_ = 0
+while (time.time() - t0 < 60*60):
+	print "Remaining time: ", 60 - (time.time() - t0) / 60.0, " minutes" 
+	timeout = 5.0
+	recSize, timeout = libxsmu.recSize (deviceID, timeout)
+	data = libxsmu.getData (deviceID)
+	for voltage in data:
+		logfile.write (str (_time_) + ", " + str (voltage) + '\n')
+		print _time_, ',\t', voltage * 1e9, ' ADC'
+		logfile.flush()
+		_time_ = _time_ + 0.1
+	time.sleep (10)
 
-	logfile.write (str (voltage) + '\n')
-	logfile.flush()
-	#sleep (1)
-
-if (timeout == 0.0):
-	print 'Communication timeout in VM_getReading.'
-	exit (-2)
-
+timeout = 5
+timeout = libxsmu.StopRec (deviceID, timeout)
+print \
+	"Stopped Recording Streamed Data"
 ##########################################################################
 # closes the device.
 

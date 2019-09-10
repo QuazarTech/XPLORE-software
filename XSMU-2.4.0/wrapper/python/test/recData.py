@@ -1,4 +1,4 @@
-import libxsmu, time, math
+import libxsmu, time, math, sys
 from time import sleep
 
 ##########################################################################
@@ -29,25 +29,21 @@ if (timeout == 0.0) or (not goodID):
 	print 'Communication timeout in open_device.'
 	exit (-2)
 
+sleep (5)
+
 ##########################################################################
-# Selects source range to 1mA
+# Queries the data stored in standby data queue in SMU
 
-logfile = open ('log.txt', 'w')
+timeout = 10.0
+size = 3
 
-for n in range (0, 100):
-	filter_length = 32
-	timeout = 1 + 0.03 * filter_length
-	voltage, timeout = libxsmu.VM_getReading (deviceID, filter_length, timeout)
-	print \
-		"voltage               :", voltage, "\n" \
-		"Remaining time        :", timeout, "sec", "\n"
-
-	logfile.write (str (voltage) + '\n')
-	logfile.flush()
-	#sleep (1)
+recSize, timeout = libxsmu.recData (deviceID, size, timeout)
+print \
+	"recSize: ", recSize, "\n" \
+	"Timeout: ", timeout
 
 if (timeout == 0.0):
-	print 'Communication timeout in VM_getReading.'
+	print 'Communication timeout in recData'
 	exit (-2)
 
 ##########################################################################
